@@ -1,0 +1,1535 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+	<title>Submit a New Report | Neotys Ushahidi</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="stylesheet" type="text/css" href="http://10.0.4.48/media/css/jquery-ui-themeroller.css?m=1430243020&" />
+<link rel="stylesheet" type="text/css" href="http://10.0.4.48/media/css/global.css?m=1430243020&" />
+<link rel="stylesheet" type="text/css" href="http://10.0.4.48/media/css/openlayers.css?m=1430243020&" />
+<link rel="stylesheet" type="text/css" href="http://10.0.4.48/media/css/jquery.treeview.css?m=1430243020&" />
+<link rel="stylesheet" type="text/css" href="http://10.0.4.48/media/css/colorpicker.css?m=1430243020&" />
+<link rel="stylesheet" type="text/css" href="http://10.0.4.48/themes/default/css/base.css?m=1430243020&" />
+<link rel="stylesheet" type="text/css" href="http://10.0.4.48/themes/default/css/accordion.css?m=1430243020&" />
+<link rel="stylesheet" type="text/css" href="http://10.0.4.48/themes/default/css/slider.css?m=1430243020&" />
+<link rel="stylesheet" type="text/css" href="http://10.0.4.48/themes/default/css/style.css?m=1430243020&" />
+
+<!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="http://10.0.4.48/themes/default/css/iehacks.css" />
+<![endif]-->
+<!--[if IE 7]><link rel="stylesheet" type="text/css" href="http://10.0.4.48/themes/default/css/ie7hacks.css" />
+<![endif]-->
+<!--[if IE 6]><link rel="stylesheet" type="text/css" href="http://10.0.4.48/themes/default/css/ie6hacks.css" />
+<![endif]-->
+<script type="text/javascript" src="http://10.0.4.48/media/js/jquery.js?m=1430243020&"></script>
+<script type="text/javascript" src="http://10.0.4.48/media/js/jquery.ui.min.js?m=1430243020&"></script>
+<script type="text/javascript" src="http://10.0.4.48/media/js/jquery.pngFix.pack.js?m=1430243020&"></script>
+<script type="text/javascript" src="http://10.0.4.48/media/js/jquery.timeago.js?m=1430243020&"></script>
+<script type="text/javascript" src="http://10.0.4.48/media/js/global.js?m=1430243020&"></script>
+<script type="text/javascript" src="http://10.0.4.48/media/js/OpenLayers.js?m=1430243020&"></script>
+<script type="text/javascript" src="http://10.0.4.48/media/js/ushahidi.js?m=1430243020&"></script>
+<script type="text/javascript" src="https://maps.google.com/maps/api/js?v=3.7&amp;sensor=false&amp;language=en_US"></script>
+<script type="text/javascript" src="http://10.0.4.48/media/js/jquery.treeview.js?m=1430243020&"></script>
+<script type="text/javascript" src="http://10.0.4.48/media/js/colorpicker.js?m=1430243020&"></script>
+<script type="text/javascript">
+//<![CDATA[
+OpenLayers.ImgPath = 'http://10.0.4.48/media/img/openlayers/';
+
+
+//]]>
+</script>
+<script type="text/javascript">
+//<![CDATA[
+		var map;
+		var thisLayer;
+		var proj_4326 = new OpenLayers.Projection('EPSG:4326');
+		var proj_900913 = new OpenLayers.Projection('EPSG:900913');
+		var vlayer;
+		var highlightCtrl;
+		var selectCtrl;
+		var selectedFeatures = [];
+		
+		// jQuery Textbox Hints Plugin
+		// Will move to separate file later or attach to forms plugin
+		jQuery.fn.hint = function (blurClass) {
+		  if (!blurClass) { 
+		    blurClass = 'texthint';
+		  }
+
+		  return this.each(function () {
+		    // Get jQuery version of 'this'
+		    var $input = jQuery(this),
+
+		    // Capture the rest of the variable to allow for reuse
+		      title = $input.attr('title'),
+		      $form = jQuery(this.form),
+		      $win = jQuery(window);
+
+		    function remove() {
+		      if ($input.val() === title && $input.hasClass(blurClass)) {
+		        $input.val('').removeClass(blurClass);
+		      }
+		    }
+
+		    // Only apply logic if the element has the attribute
+		    if (title) { 
+			
+		      // On blur, set value to title attr if text is blank
+		      $input.blur(function () {
+		        if (this.value === '') {
+		          $input.val(title).addClass(blurClass);
+		        }
+		      }).focus(remove).blur(); // now change all inputs to title
+
+		      // Clear the pre-defined text when form is submitted
+		      $form.submit(remove);
+		      $win.unload(remove); // handles Firefox's autocomplete
+			  $(".btn_find").click(remove);
+		    }
+		  });
+		};
+
+		jQuery(window).load(function() {
+			// Map options
+			var options = {
+				units: "dd",
+				numZoomLevels: 18, 
+				controls:[],
+				theme: false,
+				projection: proj_900913,
+				'displayProjection': proj_4326,
+				eventListeners: {
+					"zoomend": incidentZoom
+				},
+				maxExtent: new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34),
+				maxResolution: 156543.0339
+			};
+			
+			// Now initialise the map
+			map = new OpenLayers.Map('divMap', options);
+			
+			var google_satellite = new OpenLayers.Layer.Google("Google Maps Satellite", { 
+ type: google.maps.MapTypeId.SATELLITE,
+ animationEnabled: true,
+ sphericalMercator: true,
+ maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)});
+
+var google_hybrid = new OpenLayers.Layer.Google("Google Maps Hybrid", { 
+ type: google.maps.MapTypeId.HYBRID,
+ animationEnabled: true,
+ sphericalMercator: true,
+ maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)});
+
+var google_normal = new OpenLayers.Layer.Google("Google Maps Normal", { 
+ animationEnabled: true,
+ sphericalMercator: true,
+ maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)});
+
+var google_physical = new OpenLayers.Layer.Google("Google Maps Physical", { 
+ type: google.maps.MapTypeId.TERRAIN,
+ animationEnabled: true,
+ sphericalMercator: true,
+ maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)});
+
+			map.addLayers([google_satellite,google_hybrid,google_normal,google_physical]);
+			map.addControl(new OpenLayers.Control.Navigation());
+			map.addControl(new OpenLayers.Control.Zoom());
+			map.addControl(new OpenLayers.Control.MousePosition({
+				formatOutput: Ushahidi.convertLongLat
+			}));
+			map.addControl(new OpenLayers.Control.ScaleLine());
+			map.addControl(new OpenLayers.Control.Scale('mapScale'));
+			map.addControl(new OpenLayers.Control.LayerSwitcher());
+			
+			// Vector/Drawing Layer Styles
+			style1 = new OpenLayers.Style({
+				pointRadius: "8",
+				fillColor: "#ffcc66",
+				fillOpacity: "0.7",
+				strokeColor: "#CC0000",
+				strokeWidth: 2.5,
+				graphicZIndex: 1,
+				externalGraphic: "http://10.0.4.48/media/img/openlayers/marker.png",
+				graphicOpacity: 1,
+				graphicWidth: 21,
+				graphicHeight: 25,
+				graphicXOffset: -14,
+				graphicYOffset: -27
+			});
+			style2 = new OpenLayers.Style({
+				pointRadius: "8",
+				fillColor: "#30E900",
+				fillOpacity: "0.7",
+				strokeColor: "#197700",
+				strokeWidth: 2.5,
+				graphicZIndex: 1,
+				externalGraphic: "http://10.0.4.48/media/img/openlayers/marker-green.png",
+				graphicOpacity: 1,
+				graphicWidth: 21,
+				graphicHeight: 25,
+				graphicXOffset: -14,
+				graphicYOffset: -27
+			});
+			style3 = new OpenLayers.Style({
+				pointRadius: "8",
+				fillColor: "#30E900",
+				fillOpacity: "0.7",
+				strokeColor: "#197700",
+				strokeWidth: 2.5,
+				graphicZIndex: 1
+			});
+			
+			var vlayerStyles = new OpenLayers.StyleMap({
+				"default": style1,
+				"select": style2,
+				"temporary": style3
+			});
+			
+			// Create Vector/Drawing layer
+			vlayer = new OpenLayers.Layer.Vector( "Editable", {
+				styleMap: vlayerStyles,
+				rendererOptions: {zIndexing: true}
+			});
+			map.addLayer(vlayer);
+			
+			
+			// Drag Control
+			var drag = new OpenLayers.Control.DragFeature(vlayer, {
+				onStart: startDrag,
+				onDrag: doDrag,
+				onComplete: endDrag
+			});
+			map.addControl(drag);
+			
+			// Vector Layer Events
+			vlayer.events.on({
+				beforefeaturesadded: function(event) {
+					//for(i=0; i < vlayer.features.length; i++) {
+					//	if (vlayer.features[i].geometry.CLASS_NAME == "OpenLayers.Geometry.Point") {
+					//		vlayer.removeFeatures(vlayer.features);
+					//	}
+					//}
+					
+					// Disable this to add multiple points
+					// vlayer.removeFeatures(vlayer.features);
+				},
+				featuresadded: function(event) {
+					refreshFeatures(event);
+				},
+				featuremodified: function(event) {
+					refreshFeatures(event);
+				},
+				featuresremoved: function(event) {
+					refreshFeatures(event);
+				}
+			});
+			
+			// Vector Layer Highlight Features
+			highlightCtrl = new OpenLayers.Control.SelectFeature(vlayer, {
+			    hover: true,
+			    highlightOnly: true,
+			    renderIntent: "temporary"
+			});
+			selectCtrl = new OpenLayers.Control.SelectFeature(vlayer, {
+				clickout: true, toggle: false,
+				multiple: false, hover: false,
+				renderIntent: "select",
+				onSelect: addSelected,
+				onUnselect: clearSelected
+			});
+			map.addControl(highlightCtrl);
+			map.addControl(selectCtrl);
+			
+			// Insert Saved Geometries
+			wkt = new OpenLayers.Format.WKT();
+							// Default Point
+				point = new OpenLayers.Geometry.Point(2.213749000000007, 46.227638);
+				OpenLayers.Projection.transform(point, proj_4326, map.getProjectionObject());
+				var origFeature = new OpenLayers.Feature.Vector(point);
+				vlayer.addFeatures(origFeature);
+							
+			
+			// Create a lat/lon object
+			var startPoint = new OpenLayers.LonLat(2.213749000000007, 46.227638);
+			startPoint.transform(proj_4326, map.getProjectionObject());
+			
+			// Display the map centered on a latitude and longitude (Google zoom levels)
+			map.setCenter(startPoint, 3);
+			
+			// Create the Editing Toolbar
+			var container = document.getElementById("panel");
+			var panel = new OpenLayers.Control.EditingToolbar(
+				vlayer, {div: container}
+			);
+			map.addControl(panel);
+			panel.activateControl(panel.controls[0]);
+			drag.activate();
+			highlightCtrl.activate();
+			selectCtrl.activate();
+			
+			/**
+			 * Hack to make sure selectControl always works 
+			 *
+			 * Override navigation activate/deactive to also activate/deactive
+			 * the selectCtrl. Previously selectCtrl was not being re-activated
+			 * after new features were added.
+			 */
+			navigationCtrl = panel.controls[0];
+			navigationCtrl.navActivate = panel.controls[0].activate;
+			navigationCtrl.navDeactivate = panel.controls[0].deactivate;
+			navigationCtrl.activate = function () {
+				this.navActivate();
+				selectCtrl.activate();
+			};
+			navigationCtrl.deactivate = function () {
+				this.navDeactivate();
+				selectCtrl.deactivate();
+			};
+			map.events.register("click", map, function(e){
+				selectCtrl.deactivate();
+				selectCtrl.activate();
+			});
+			
+			// Undo Action Removes Most Recent Marker
+			$('.btn_del_last').on('click', function () {
+				if (vlayer.features.length > 0) {
+					x = vlayer.features.length - 1;
+					vlayer.removeFeatures(vlayer.features[x]);
+				}
+				$('#geometry_color').ColorPickerHide();
+				$('#geometryLabelerHolder').hide(400);
+				selectCtrl.activate();
+				return false;
+			});
+			
+			// Delete Selected Features
+			$('.btn_del_sel').on('click', function () {
+				for(var y=0; y < selectedFeatures.length; y++) {
+					vlayer.removeFeatures(selectedFeatures);
+				}
+				$('#geometry_color').ColorPickerHide();
+				$('#geometryLabelerHolder').hide(400);
+				selectCtrl.activate();
+				return false;
+			});
+			
+			// Clear Map
+			$('.btn_clear').on('click', function () {
+				vlayer.removeFeatures(vlayer.features);
+				$('input[name="geometry[]"]').remove();
+				$("#latitude").val("");
+				$("#longitude").val("");
+				$('#geometry_label').val("");
+				$('#geometry_comment').val("");
+				$('#geometry_color').val("");
+				$('#geometry_lat').val("");
+				$('#geometry_lon').val("");
+				$('#geometry_color').ColorPickerHide();
+				$('#geometryLabelerHolder').hide(400);
+				selectCtrl.activate();
+				return false;
+			});
+			
+			// GeoCode
+			$('.btn_find').on('click', function () {
+				geoCode();
+			});
+			$('#location_find').bind('keypress', function(e) {
+				var code = (e.keyCode ? e.keyCode : e.which);
+				if(code == 13) { //Enter keycode
+					geoCode();
+					return false;
+				}
+			});
+			
+			// Event on Latitude/Longitude Typing Change
+			$('#latitude, #longitude').bind("blur", function() {
+				var newlat = $("#latitude").val();
+				var newlon = $("#longitude").val();
+				// Do nothing if either field is empty.
+				if (newlat == '' || newlon == '') return;
+				if (!isNaN(newlat) && !isNaN(newlon))
+				{
+					// Clear the map first
+					vlayer.removeFeatures(vlayer.features);
+					$('input[name="geometry[]"]').remove();
+					
+					point = new OpenLayers.Geometry.Point(newlon, newlat);
+					OpenLayers.Projection.transform(point, proj_4326,proj_900913);
+					
+					f = new OpenLayers.Feature.Vector(point);
+					vlayer.addFeatures(f);
+					
+					// create a new lat/lon object
+					myPoint = new OpenLayers.LonLat(newlon, newlat);
+					myPoint.transform(proj_4326, map.getProjectionObject());
+
+					// display the map centered on a latitude and longitude
+					map.panTo(myPoint);
+				}
+				else
+				{
+					// Commenting this out as its horribly annoying
+					//alert('Invalid value!');
+				}
+			});
+			
+			/* Form Actions */
+			// Action on Save Only
+			$('.btn_save').on('click', function () {
+				$("#save").attr("value", "dontclose");
+				$(this).parents("form").submit();
+				return false;
+			});
+			
+			$('.btn_save_close').on('click', function () {
+				$(this).parents("form").submit();
+				return false;
+			});
+
+			$('.btn_save_add_new').on('click', function () {
+				$("#save").attr("value", "addnew");
+				$(this).parents("form").submit();
+				return false;
+			});
+			
+			// Delete Action
+			$('.btn_delete').on('click', function () {
+				var agree=confirm("Are you sure you want to Delete?");
+				if (agree){
+					$('#reportMain').submit();
+				}
+				return false;
+			});
+			
+			// Toggle Date Editor
+			$('a#date_toggle').click(function() {
+		    	$('#datetime_edit').show(400);
+				$('#datetime_default').hide();
+		    	return false;
+			});
+			
+			// Show Messages Box
+		    $('a#messages_toggle').click(function() {
+		    	$('#show_messages').toggle(400);
+		    	return false;
+			});
+			
+			// Textbox Hints
+			
+			/* Dynamic categories */
+					
+			// Category treeview
+			$(".category-column").treeview({
+			  persist: "location",
+			  collapsed: true,
+			  unique: false
+			});
+			
+			// Date Picker JS
+			$("#incident_date").datepicker({ 
+			    showOn: "both", 
+			    buttonImage: "http://10.0.4.48/media/img/icon-calendar.gif", 
+			    buttonImageOnly: true 
+			});
+			
+			// Handles the functionality for changing the size of the map
+			// TODO: make the CSS widths dynamic... instead of hardcoding, grab the width's
+			// from the appropriate parent divs
+			$('.map-toggles a').click(function() {
+				var action = $(this).attr("class");
+				$('ul.map-toggles li').hide();
+				switch(action)
+				{
+					case "wider-map":
+						$('.incident-location').insertBefore($('.f-col'));
+						$('.map_holder_reports').css({"height":"350px", "width": "935px"});
+						$('.incident-location h4').css({"margin-left":"10px"});
+						$('.location-info').css({"margin-right":"14px"});
+						$('a[href=#report-map]').parent().hide();
+						$('a.taller-map').parent().show();
+						$('a.smaller-map').parent().show();
+						break;
+					case "taller-map":
+						$('.map_holder_reports').css("height","600px");
+						$('a.shorter-map').parent().show();
+						$('a.smaller-map').parent().show();
+						break;
+					case "shorter-map":
+						$('.map_holder_reports').css("height","350px");
+						$('a.taller-map').parent().show();
+						$('a.smaller-map').parent().show();
+						break;
+					case "smaller-map":
+						$('.incident-location').hide().prependTo($('.f-col-1'));
+						$('.map_holder_reports').css({"height":"350px", "width": "494px"});
+						$('a.wider-map').parent().show();
+						$('.incident-location').show();
+						$('.incident-location h4').css({"margin-left":"0"});
+						$('.location-info').css({"margin-right":"0"});
+						break;
+				};
+				
+				map.updateSize();
+				map.pan(0,1);
+				
+				return false;
+			});
+			
+			
+			// Prevent Map Effects in the Geometry Labeler
+			$('#geometryLabelerHolder').click(function(evt) {
+				var e = evt ? evt : window.event; 
+				OpenLayers.Event.stop(e);
+				return false;
+			});
+			
+			// Geometry Label Text Boxes
+			$('#geometry_label').click(function() {
+				$('#geometry_label').focus();
+				$('#geometry_color').ColorPickerHide();
+			}).bind("change keyup blur", function(){
+				for (f in selectedFeatures) {
+					selectedFeatures[f].label = this.value;
+				}
+				refreshFeatures();
+			});
+			
+			$('#geometry_comment').click(function() {
+				$('#geometry_comment').focus();
+				$('#geometry_color').ColorPickerHide();
+			}).bind("change keyup blur", function(){
+				for (f in selectedFeatures) {
+					selectedFeatures[f].comment = this.value;
+			    }
+				refreshFeatures();
+			});
+			
+			$('#geometry_lat').click(function() {
+				$('#geometry_lat').focus();
+				$('#geometry_color').ColorPickerHide();
+			}).bind("change keyup blur", function(){
+				for (f in selectedFeatures) {
+					selectedFeatures[f].lat = this.value;
+			    }
+				refreshFeatures();
+			});
+			
+			$('#geometry_lon').click(function() {
+				$('#geometry_lon').focus();
+				$('#geometry_color').ColorPickerHide();
+			}).bind("change keyup blur", function(){
+				for (f in selectedFeatures) {
+					selectedFeatures[f].lon = this.value;
+			    }
+				refreshFeatures();
+			});
+			
+			// Event on Latitude/Longitude Typing Change
+			$('#geometry_lat, #geometry_lon').bind("change keyup", function() {
+				var newlat = $("#geometry_lat").val();
+				var newlon = $("#geometry_lon").val();
+				if (!isNaN(newlat) && !isNaN(newlon))
+				{
+					var lonlat = new OpenLayers.LonLat(newlon, newlat);
+					lonlat.transform(proj_4326,proj_900913);
+					for (f in selectedFeatures) {
+						selectedFeatures[f].geometry.x = lonlat.lon;
+						selectedFeatures[f].geometry.y = lonlat.lat;
+						selectedFeatures[f].lon = newlat;
+						selectedFeatures[f].lat = newlon;
+						vlayer.drawFeature(selectedFeatures[f]);
+				    }
+				}
+				else
+				{
+					alert('Invalid value!')
+				}
+			});
+				
+			// Event on Color Change
+			$('#geometry_color').ColorPicker({
+				onSubmit: function(hsb, hex, rgb) {
+					$('#geometry_color').val(hex);
+					for (f in selectedFeatures) {
+						selectedFeatures[f].color = hex;
+						updateFeature(selectedFeatures[f], hex, '');
+				    }
+					refreshFeatures();
+				},
+				onChange: function(hsb, hex, rgb) {
+					$('#geometry_color').val(hex);
+					for (f in selectedFeatures) {
+						selectedFeatures[f].color = hex;
+						updateFeature(selectedFeatures[f], hex, '');
+				    }
+					refreshFeatures();
+				},
+				onBeforeShow: function () {
+					$(this).ColorPickerSetColor(this.value);
+					for (f in selectedFeatures) {
+						selectedFeatures[f].color = this.value;
+						updateFeature(selectedFeatures[f], this.value, '');
+				    }
+					refreshFeatures();
+				}
+			}).bind('keyup', function(){
+				$(this).ColorPickerSetColor(this.value);
+				for (f in selectedFeatures) {
+					selectedFeatures[f].color = this.value;
+					updateFeature(selectedFeatures[f], this.value, '');
+			    }
+				refreshFeatures();
+			});
+			
+			// Event on StrokeWidth Change
+			$('#geometry_strokewidth').bind("change keyup", function() {
+				if (parseFloat(this.value) && parseFloat(this.value) <= 8) {
+					for (f in selectedFeatures) {
+						selectedFeatures[f].strokewidth = this.value;
+						updateFeature(selectedFeatures[f], '', parseFloat(this.value));
+					}
+					refreshFeatures();
+				}
+			});
+			
+			// Close Labeler
+			$('#geometryLabelerClose').click(function() {
+				$('#geometryLabelerHolder').hide(400);
+				for (f in selectedFeatures) {
+					selectCtrl.unselect(selectedFeatures[f]);
+				}
+				selectCtrl.activate();
+			});
+
+			// Detect Dropdown Select
+			$("#select_city").change(function() {
+				var lonlat = $(this).val().split(",");
+				if ( lonlat[0] && lonlat[1] )
+				{
+					// Clear the map first
+					vlayer.removeFeatures(vlayer.features);
+					$('input[name="geometry[]"]').remove();
+
+					point = new OpenLayers.Geometry.Point(lonlat[0], lonlat[1]);
+					OpenLayers.Projection.transform(point, proj_4326,proj_900913);
+
+					f = new OpenLayers.Feature.Vector(point);
+					vlayer.addFeatures(f);
+
+					// create a new lat/lon object
+					myPoint = new OpenLayers.LonLat(lonlat[0], lonlat[1]);
+					myPoint.transform(proj_4326, map.getProjectionObject());
+
+					// display the map centered on a latitude and longitude
+					map.panTo(myPoint);
+
+					// Update form values (jQuery)
+					$("#location_name").attr("value", $('#select_city :selected').text());
+
+					$("#latitude").attr("value", lonlat[1]);
+					$("#longitude").attr("value", lonlat[0]);
+				}
+			});
+
+		});
+		
+		function addFormField(div, field, hidden_id, field_type) {
+			var id = document.getElementById(hidden_id).value;
+			
+			// HTML for the form field to be added
+			var formFieldHTML = "<div class=\"row link-row second\" id=\"" + field + "_" + id + "\">" +
+			    "<input type=\"" + field_type + "\" name=\"" + field + "[]\" class=\"" + field_type + " long2\" />" +
+			    "<a href=\"#\" class=\"add\" "+
+			    "    onClick=\"addFormField('" + div + "','" + field + "','" + hidden_id + "','" + field_type + "'); return false;\">"+
+			    "    add</a>" +
+			    "<a href=\"#\" class=\"rem\"  onClick='removeFormField(\"#" + field + "_" + id + "\"); return false;'>remove</a></div>";
+
+			$("#" + div).append(formFieldHTML);
+
+			$("#" + field + "_" + id).effect("highlight", {}, 800);
+
+			id = (id - 1) + 2;
+			document.getElementById(hidden_id).value = id;
+		}
+
+		function removeFormField(id) {
+			var answer = confirm("Are you sure you want to delete this item??");
+		    if (answer){
+				$(id).remove();
+		    }
+			else{
+				return false;
+		    }
+		}
+		
+		function deletePhoto (id, div)
+		{
+			var answer = confirm("Are you sure you want to delete this photo??");
+		    if (answer){
+				$("#" + div).effect("highlight", {}, 800);
+				$.get("http://10.0.4.48/admin/reports/deletePhoto/" + id);
+				$("#" + div).remove();
+		    }
+			else{
+				return false;
+		    }
+		}
+		
+		/**
+		 * Google GeoCoder
+		 */
+		function geoCode()
+		{
+			$('#find_loading').html('<img src="http://10.0.4.48/media/img/loading_g.gif">');
+			address = $("#location_find").val();
+			$.post("http://10.0.4.48/reports/geocode/", { address: address },
+				function(data){
+					if (data.status == 'success'){
+						// Clear the map first
+						vlayer.removeFeatures(vlayer.features);
+						$('input[name="geometry[]"]').remove();
+						
+						point = new OpenLayers.Geometry.Point(data.longitude, data.latitude);
+						OpenLayers.Projection.transform(point, proj_4326,proj_900913);
+						
+						f = new OpenLayers.Feature.Vector(point);
+						vlayer.addFeatures(f);
+						
+						// create a new lat/lon object
+						myPoint = new OpenLayers.LonLat(data.longitude, data.latitude);
+						myPoint.transform(proj_4326, map.getProjectionObject());
+
+						// display the map centered on a latitude and longitude
+						map.panTo(myPoint);
+												
+						// Update form values
+						$("#country_name").val(data.country);
+						$("#latitude").val(data.latitude);
+						$("#longitude").val(data.longitude);
+						$("#location_name").val(data.location_name);
+					} else {
+						// Alert message to be displayed
+						var alertMessage = address + " not found!\n\n***************************\n" + 
+						    "Enter more details like city, town, country\nor find a city or town " +
+						    "close by and zoom in\nto find your precise location";
+
+						alert(alertMessage)
+					}
+					$('div#find_loading').html('');
+				}, "json");
+			return false;
+		}
+		
+		function formSwitch(form_id, incident_id)
+		{
+			var answer = confirm('Are you sure you want to switch forms??');
+			if (answer){
+				$('#form_loader').html('<img src="http://10.0.4.48/media/img/loading_g.gif">');
+				$.post("http://10.0.4.48/reports/switch_form", { form_id: form_id, incident_id: incident_id },
+					function(data){
+						if (data.status == 'success'){
+							$('#custom_forms').html('');
+							$('#custom_forms').html(data.response);
+							$('#form_loader').html('');
+						}
+				  	}, "json");
+			}
+		}
+		
+		/* Keep track of the selected features */
+		function addSelected(feature) {
+			selectedFeatures.push(feature);
+			selectCtrl.activate();
+			if (vlayer.features.length == 1 && feature.geometry.CLASS_NAME == "OpenLayers.Geometry.Point") {
+				// This is a single point, no need for geometry metadata
+			} else {
+				$('#geometryLabelerHolder').show(400);
+				if (feature.geometry.CLASS_NAME == "OpenLayers.Geometry.Point") {
+					$('#geometryLat').show();
+					$('#geometryLon').show();
+					$('#geometryColor').hide();
+					$('#geometryStrokewidth').hide();
+					thisPoint = feature.clone();
+					thisPoint.geometry.transform(proj_900913,proj_4326);
+					$('#geometry_lat').val(thisPoint.geometry.y);
+					$('#geometry_lon').val(thisPoint.geometry.x);
+				} else {
+					$('#geometryLat').hide();
+					$('#geometryLon').hide();
+					$('#geometryColor').show();
+					$('#geometryStrokewidth').show();
+				}
+				if ( typeof(feature.label) != 'undefined') {
+					$('#geometry_label').val(feature.label);
+				}
+				if ( typeof(feature.comment) != 'undefined') {
+					$('#geometry_comment').val(feature.comment);
+				}
+				if ( typeof(feature.lon) != 'undefined') {
+					$('#geometry_lon').val(feature.lon);
+				}
+				if ( typeof(feature.lat) != 'undefined') {
+					$('#geometry_lat').val(feature.lat);
+				}
+				if ( typeof(feature.color) != 'undefined') {
+					$('#geometry_color').val(feature.color);
+				}
+				if ( typeof(feature.strokewidth) != 'undefined' && feature.strokewidth != '') {
+					$('#geometry_strokewidth').val(feature.strokewidth);
+				} else {
+					$('#geometry_strokewidth').val("2.5");
+				}
+			}
+		}
+
+		/* Clear the list of selected features */
+		function clearSelected(feature) {
+		    selectedFeatures = [];
+			$('#geometryLabelerHolder').hide(400);
+			$('#geometry_label').val("");
+			$('#geometry_comment').val("");
+			$('#geometry_color').val("");
+			$('#geometry_lat').val("");
+			$('#geometry_lon').val("");
+			selectCtrl.deactivate();
+			selectCtrl.activate();
+			$('#geometry_color').ColorPickerHide();
+		}
+
+		/* Feature starting to move */
+		function startDrag(feature, pixel) {
+		    lastPixel = pixel;
+		}
+
+		/* Feature moving */
+		function doDrag(feature, pixel) {
+		    for (f in selectedFeatures) {
+		        if (feature != selectedFeatures[f]) {
+		            var res = map.getResolution();
+		            selectedFeatures[f].geometry.move(res * (pixel.x - lastPixel.x), res * (lastPixel.y - pixel.y));
+		            vlayer.drawFeature(selectedFeatures[f]);
+		        }
+		    }
+		    lastPixel = pixel;
+		}
+
+		/* Featrue stopped moving */
+		function endDrag(feature, pixel) {
+		    for (f in selectedFeatures) {
+		        f.state = OpenLayers.State.UPDATE;
+		    }
+			refreshFeatures();
+			
+			// Fetching Lat Lon Values
+		  	var latitude = parseFloat($("#latitude").val());
+			var longitude = parseFloat($("#longitude").val());
+			
+			// Looking up country name using reverse geocoding
+			reverseGeocode(latitude, longitude);
+		}
+		
+		function refreshFeatures(event) {
+			var geoCollection = new OpenLayers.Geometry.Collection;
+			$('input[name="geometry[]"]').remove();
+			for(i=0; i < vlayer.features.length; i++) {
+				newFeature = vlayer.features[i].clone();
+				newFeature.geometry.transform(proj_900913,proj_4326);
+				geoCollection.addComponents(newFeature.geometry);
+				if (vlayer.features.length == 1 && vlayer.features[i].geometry.CLASS_NAME == "OpenLayers.Geometry.Point") {
+					// If feature is a Single Point - save as lat/lon
+				} else {
+					// Otherwise, save geometry values
+					// Convert to Well Known Text
+					var format = new OpenLayers.Format.WKT();
+					var geometry = format.write(newFeature);
+					var label = '';
+					var comment = '';
+					var lon = '';
+					var lat = '';
+					var color = '';
+					var strokewidth = '';
+					if ( typeof(vlayer.features[i].label) != 'undefined') {
+						label = vlayer.features[i].label;
+					}
+					if ( typeof(vlayer.features[i].comment) != 'undefined') {
+						comment = vlayer.features[i].comment;
+					}
+					if ( typeof(vlayer.features[i].lon) != 'undefined') {
+						lon = vlayer.features[i].lon;
+					}
+					if ( typeof(vlayer.features[i].lat) != 'undefined') {
+						lat = vlayer.features[i].lat;
+					}
+					if ( typeof(vlayer.features[i].color) != 'undefined') {
+						color = vlayer.features[i].color;
+					}
+					if ( typeof(vlayer.features[i].strokewidth) != 'undefined') {
+						strokewidth = vlayer.features[i].strokewidth;
+					}
+					geometryAttributes = JSON.stringify({ geometry: geometry, label: label, comment: comment,lat: lat, lon: lon, color: color, strokewidth: strokewidth});
+					$('#reportForm').append($('<input></input>').attr('name','geometry[]').attr('type','hidden').attr('value',geometryAttributes));
+				}
+			}
+			
+			// Centroid of location will constitute the Location
+			// if its not a point
+			centroid = geoCollection.getCentroid(true);
+			$("#latitude").val(centroid.y);
+			$("#longitude").val(centroid.x);
+		}
+		
+		function incidentZoom(event) {
+			$("#incident_zoom").val(map.getZoom());
+		}
+		
+		function updateFeature(feature, color, strokeWidth){
+		
+			// Create a symbolizer from exiting stylemap
+			var symbolizer = feature.layer.styleMap.createSymbolizer(feature);
+			
+			// Color available?
+			if (color) {
+				symbolizer['fillColor'] = "#"+color;
+				symbolizer['strokeColor'] = "#"+color;
+				symbolizer['fillOpacity'] = "0.7";
+			} else {
+				if ( typeof(feature.color) != 'undefined' && feature.color != '' ) {
+					symbolizer['fillColor'] = "#"+feature.color;
+					symbolizer['strokeColor'] = "#"+feature.color;
+					symbolizer['fillOpacity'] = "0.7";
+				}
+			}
+			
+			// Stroke available?
+			if (parseFloat(strokeWidth)) {
+				symbolizer['strokeWidth'] = parseFloat(strokeWidth);
+			} else if ( typeof(feature.strokewidth) != 'undefined' && feature.strokewidth !='' ) {
+				symbolizer['strokeWidth'] = feature.strokewidth;
+			} else {
+				symbolizer['strokeWidth'] = "2.5";
+			}
+			
+			// Set the unique style to the feature
+			feature.style = symbolizer;
+
+			// Redraw the feature with its new style
+			feature.layer.drawFeature(feature);
+		}
+		
+		// Reverse GeoCoder
+		function reverseGeocode(latitude, longitude) {		
+			var latlng = new google.maps.LatLng(latitude, longitude);
+			var geocoder = new google.maps.Geocoder();
+			geocoder.geocode({'latLng': latlng}, function(results, status){
+				if (status == google.maps.GeocoderStatus.OK) {
+					var country = results[results.length - 1].formatted_address;
+					$("#country_name").val(country);
+				} else {
+					console.log("Geocoder failed due to: " + status);
+				}
+			});
+		}
+
+
+
+//]]>
+</script>
+	
+</head>
+
+
+<body id="page" class="page-reports-submit">
+
+	<div id="header_nav">
+	<ul id="header_nav_left">
+		<li><span class="bignext">&raquo;</span><a href="http://10.0.4.48/">Neotys Ushahidi</a></li>
+			</ul>
+
+	
+	<ul id="header_nav_right">
+		<li class="header_nav_user header_nav_has_dropdown">
+		
+			<a href="http://10.0.4.48/login" style="float:right;padding-top:8px;"><span class="header_nav_label"><strong>Login</strong></span></a>
+			
+			<div class="header_nav_dropdown" style="display:none;">
+			
+				<form action="http://10.0.4.48/login" method="post" id="userpass_form">
+<input type="hidden" name="form_auth_token" value="5fed38164fddc11b46076e1d55853040fa2ecf1b30cec05144be0a349b0d5e1a"  />
+
+				<input type="hidden" name="action" value="signin" />
+	
+				<ul>
+					<li><label for="username">Email</label><input type="text" name="username" id="username" class="" /></li>
+	
+					<li><label for="password">Password</label><input name="password" type="password" class="" id="password" size="20" /></li>
+	
+					<li><input type="submit" name="submit" value="Login" class="header_nav_login_btn" /></li>
+				</ul>
+				</form>
+				
+				<ul>
+	
+					<li><a href="http://10.0.4.48/login/?newaccount">Create an Account</a></li>
+	
+					<li><a href="#" id="header_nav_forgot" onclick="return false">Forgot your password?</a>
+						<form action="http://10.0.4.48/login" method="post" id="header_nav_userforgot_form">
+<input type="hidden" name="form_auth_token" value="5fed38164fddc11b46076e1d55853040fa2ecf1b30cec05144be0a349b0d5e1a"  />
+
+						<input type="hidden" name="action" value="forgot" />
+						<label for="resetemail">Registered Email</label>
+						<input type="text" id="resetemail" name="resetemail" value="" />
+	
+						<input type="submit" name="submit" value="Reset Password" class="header_nav_login_btn" />
+						</form>
+	
+					</li>
+				</ul>
+			</div>
+
+				</li>
+	</ul>
+</div>
+	<!-- wrapper -->
+	<div class="wrapper floatholder rapidxwpr">
+
+		<!-- header -->
+		<div id="header">
+
+			<!-- searchbox -->
+			<div id="searchbox">
+
+				<!-- languages -->
+				<div class="language-box"><form action="http://10.0.4.48/reports/submit" method="get">
+<select id="l" name="l"  onchange="this.form.submit()" >
+<option value="af">Afrikaans</option>
+<option value="az_AZ">Azərbaycan dili (AZ)</option>
+<option value="id_ID">Bahasa Indonesia (ID)</option>
+<option value="bs_BA">Bosanski (BA)</option>
+<option value="ca_ES">Català (ES)</option>
+<option value="sn">chiShona</option>
+<option value="cy">Cymraeg</option>
+<option value="cy_GB">Cymraeg (GB)</option>
+<option value="da">Dansk</option>
+<option value="de_DE">Deutsch (DE)</option>
+<option value="en_GB">English (GB)</option>
+<option value="en_US" selected="selected">English (US)</option>
+<option value="es_AR">Español (AR)</option>
+<option value="es_CL">Español (CL)</option>
+<option value="es_ES">Español (ES)</option>
+<option value="es_PE">Español (PE)</option>
+<option value="es_VE">Español (VE)</option>
+<option value="eu">Euskara</option>
+<option value="fr_FR">Français (FR)</option>
+<option value="ga_IE">Gaeilge (IE)</option>
+<option value="gl">Galego</option>
+<option value="hr">hrvatski</option>
+<option value="it_IT">Italiano (IT)</option>
+<option value="sw_KE">Kiswahili (KE)</option>
+<option value="ht_HT">Kreyòl ayisyen (HT)</option>
+<option value="ku">Kurdî, كوردی‎</option>
+<option value="ku_IQ">Kurdî, كوردی‎ (IQ)</option>
+<option value="lt">Lietuvių</option>
+<option value="lg">Luganda</option>
+<option value="hu_HU">Magyar (HU)</option>
+<option value="nl_NL">Nederlands (NL)</option>
+<option value="no">Norsk</option>
+<option value="pl_PL">Polski (PL)</option>
+<option value="pt_BR">Português (BR)</option>
+<option value="pt_PT">Português (PT)</option>
+<option value="pr_US">pr (US)</option>
+<option value="ro_RO">română (RO)</option>
+<option value="sq_AL">Shqip (AL)</option>
+<option value="sk">Slovenčina</option>
+<option value="sk_SK">Slovenčina (SK)</option>
+<option value="sl_SI">Slovenščina (SI)</option>
+<option value="so">Soomaaliga, af Soomaali</option>
+<option value="fi">Suomi</option>
+<option value="sv_SE">Svenska (SE)</option>
+<option value="vi">Tiếng Việt</option>
+<option value="vi_VN">Tiếng Việt (VN)</option>
+<option value="tr_TR">Türkçe (TR)</option>
+<option value="cs_CZ">česky, čeština (CZ)</option>
+<option value="el">Ελληνικά</option>
+<option value="bg_BG">Български (BG)</option>
+<option value="mk_MK">Македонски (MK)</option>
+<option value="ru_RU">Русский (RU)</option>
+<option value="sr">Српски</option>
+<option value="sr_RS">Српски (RS)</option>
+<option value="uk">Українська</option>
+<option value="uk_UA">Українська (UA)</option>
+<option value="hy_AM">Հայերեն (AM)</option>
+<option value="he_IL">עברית (IL)</option>
+<option value="ur_PK">اردو (PK)</option>
+<option value="ar">العربية</option>
+<option value="ar_EG">العربية (EG)</option>
+<option value="fa">فارسی</option>
+<option value="ps">پښتو</option>
+<option value="dv">ދިވެހި</option>
+<option value="ne_NP">नेपाली (NP)</option>
+<option value="sa">संस्कृतम्</option>
+<option value="hi_IN">हिन्दी, हिंदी (IN)</option>
+<option value="bn">বাংলা</option>
+<option value="bn_BD">বাংলা (BD)</option>
+<option value="pa">ਪੰਜਾਬੀ, پنجابی‎</option>
+<option value="te">తెలుగు</option>
+<option value="si">සිංහල</option>
+<option value="th_TH">ไทย (TH)</option>
+<option value="ka_GE">ქართული (GE)</option>
+<option value="am">አማርኛ</option>
+<option value="km">ភាសាខ្មែរ</option>
+<option value="zh">中文 (Zhōngwén), 汉语, 漢語</option>
+<option value="zh_CN">中文 (Zhōngwén), 汉语, 漢語 (CN)</option>
+<option value="zh_TW">中文 (Zhōngwén), 汉语, 漢語 (TW)</option>
+<option value="ja_JP">日本語 (にほんご／にっぽんご) (JP)</option>
+<option value="ko_KR">한국어 (韓國語), 조선말 (朝鮮語) (KR)</option>
+</select></form>
+</div>				<!-- / languages -->
+
+				<!-- searchform -->
+				<div class="search-form"><form action="http://10.0.4.48/search" method="get" id="search">
+<ul><li><input type="text" name="k" value="" class="text" /></li><li><input type="submit" name="b" class="searchbtn" value="Search" /></li></ul></form>
+</div>				<!-- / searchform -->
+
+			</div>
+			<!-- / searchbox -->
+
+			<!-- logo -->
+						<a href="http://10.0.4.48/"><img src="http://10.0.4.48/media/uploads/banner_1437742016.png" alt="Neotys Ushahidi" /></a>
+						<!-- / logo -->
+
+			<!-- submit incident -->
+			<div class="submit-incident clearingfix"><a href="http://10.0.4.48/reports/submit">Submit a Report</a></div>			<!-- / submit incident -->
+
+		</div>
+		<!-- / header -->
+        <!-- / header item for plugins -->
+        
+		<!-- main body -->
+		<div id="middle">
+			<div class="background layoutleft">
+
+				<!-- mainmenu -->
+				<div id="mainmenu" class="clearingfix">
+					<ul>
+						<li><a href="http://10.0.4.48/main">Home</a></li><li><a href="http://10.0.4.48/reports">Reports</a></li><li><a href="http://10.0.4.48/reports/submit" class="active">Submit a Report</a></li>					</ul>
+
+					
+				</div>
+				<!-- / mainmenu -->
+<div id="content">
+	<div class="content-bg">
+
+		
+		<!-- start report form block -->
+		<form action="http://10.0.4.48/reports/submit" method="post" id="reportForm" name="reportForm" class="gen_forms" enctype="multipart/form-data">
+<input type="hidden" name="form_auth_token" value="5fed38164fddc11b46076e1d55853040fa2ecf1b30cec05144be0a349b0d5e1a"  />
+
+		<input type="hidden" name="latitude" id="latitude" value="">
+		<input type="hidden" name="longitude" id="longitude" value="">
+		<input type="hidden" name="country_name" id="country_name" value="France" />
+		<input type="hidden" name="incident_zoom" id="incident_zoom" value="" />
+		<div class="big-block">
+			<h1>Submit a New Report</h1>
+						<div class="row">
+				<input type="hidden" name="form_id" id="form_id" value="">
+			</div>
+			<div class="report_left">
+				<div class="report_row">
+										<h4>Report Title <span class="required">*</span> </h4>
+					<input type="text" id="incident_title" name="incident_title" value=""  class="text long" />				</div>
+				<div class="report_row">
+					<h4>Description <span class="required">*</span> </h4>
+					<span class="allowed-html">Allowed HTML tags: "a, p, img, br, b, u, strong, em, i, iframe".<br/> Iframes are only allowed from: %^//(www.youtube.com/embed/, player.vimeo.com/video/, w.soundcloud.com/player!.</span>
+					<textarea id="incident_description" name="incident_description"  rows="10" class="textarea long" ></textarea>				</div>
+				<div class="report_row" id="datetime_default">
+					<h4>
+						<a href="#" id="date_toggle" class="show-more">Modify Date</a>
+						Date & Time: 
+						Today at <span id='current_time'>08:06 am</span>											</h4>
+				</div>
+				<div class="report_row hide" id="datetime_edit">
+					<div class="date-box">
+						<h4>Date</h4>
+						<input type="text" id="incident_date" name="incident_date" value="07/27/2015"  class="text short" />						<script type="text/javascript">
+							$().ready(function() {
+								$("#incident_date").datepicker({ 
+									showOn: "both", 
+									buttonImage: "http://10.0.4.48/media/img/icon-calendar.gif", 
+									buttonImageOnly: true 
+								});
+							});
+						</script>
+					</div>
+					<div class="time">
+						<h4>Time</h4>
+						<select id="incident_hour" name="incident_hour" >
+<option value="01">01</option>
+<option value="02">02</option>
+<option value="03">03</option>
+<option value="04">04</option>
+<option value="05">05</option>
+<option value="06">06</option>
+<option value="07">07</option>
+<option value="08" selected="selected">08</option>
+<option value="09">09</option>
+<option value="10">10</option>
+<option value="11">11</option>
+<option value="12">12</option>
+</select><span class="dots">:</span><select id="incident_minute" name="incident_minute" >
+<option value="00">00</option>
+<option value="01">01</option>
+<option value="02">02</option>
+<option value="03">03</option>
+<option value="04">04</option>
+<option value="05">05</option>
+<option value="06" selected="selected">06</option>
+<option value="07">07</option>
+<option value="08">08</option>
+<option value="09">09</option>
+<option value="10">10</option>
+<option value="11">11</option>
+<option value="12">12</option>
+<option value="13">13</option>
+<option value="14">14</option>
+<option value="15">15</option>
+<option value="16">16</option>
+<option value="17">17</option>
+<option value="18">18</option>
+<option value="19">19</option>
+<option value="20">20</option>
+<option value="21">21</option>
+<option value="22">22</option>
+<option value="23">23</option>
+<option value="24">24</option>
+<option value="25">25</option>
+<option value="26">26</option>
+<option value="27">27</option>
+<option value="28">28</option>
+<option value="29">29</option>
+<option value="30">30</option>
+<option value="31">31</option>
+<option value="32">32</option>
+<option value="33">33</option>
+<option value="34">34</option>
+<option value="35">35</option>
+<option value="36">36</option>
+<option value="37">37</option>
+<option value="38">38</option>
+<option value="39">39</option>
+<option value="40">40</option>
+<option value="41">41</option>
+<option value="42">42</option>
+<option value="43">43</option>
+<option value="44">44</option>
+<option value="45">45</option>
+<option value="46">46</option>
+<option value="47">47</option>
+<option value="48">48</option>
+<option value="49">49</option>
+<option value="50">50</option>
+<option value="51">51</option>
+<option value="52">52</option>
+<option value="53">53</option>
+<option value="54">54</option>
+<option value="55">55</option>
+<option value="56">56</option>
+<option value="57">57</option>
+<option value="58">58</option>
+<option value="59">59</option>
+</select><span class="dots">:</span><select id="incident_ampm" name="incident_ampm" >
+<option value="pm">pm</option>
+<option value="am" selected="selected">am</option>
+</select>													<small>(0)</small>
+											</div>
+					<div style="clear:both; display:block;" id="incident_date_time"></div>
+				</div>
+				<div class="report_row">
+					<!-- Adding event for endtime plugin to hook into -->
+								</div>
+				<div class="report_row">
+					<h4>Categories <span class="required">*</span></h4>
+					<div class="report_category" id="categories">
+					
+<ul class="category-column category-column-1" id="category-column-1">
+
+	<li title="Cyclone">
+		<label><input type="checkbox" name="incident_category[]" value="1"  class="check-box" />Cyclone</label>
+	</li>
+
+	<li title="Avalanche">
+		<label><input type="checkbox" name="incident_category[]" value="2"  class="check-box" />Avalanche</label>
+	</li>
+</ul>
+<ul class="category-column category-column-2" id="category-column-2">
+	<li title="Fire">
+		<label><input type="checkbox" name="incident_category[]" value="3"  class="check-box" />Fire</label>
+	</li>
+</ul>
+					</div>
+				</div>
+
+
+				
+				<div id="custom_forms">
+
+</div>
+				<div class="report_optional">
+					<h3>Optional Information</h3>
+					<div class="report_row">
+						<h4>First Name</h4>
+						<input type="text" id="person_first" name="person_first" value=""  class="text long" />					</div>
+					<div class="report_row">
+						<h4>Last Name</h4>
+						<input type="text" id="person_last" name="person_last" value=""  class="text long" />					</div>
+					<div class="report_row">
+						<h4>Email</h4>
+						<input type="text" id="person_email" name="person_email" value=""  class="text long" />					</div>
+									</div>
+			</div>
+			<div class="report_right">
+								<div class="report_row">
+					<h4>Find a location near you</h4>
+					<select id="select_city" name="select_city"  class="select" >
+<option value="" selected="selected">Select a City</option>
+<option value="5.447474,43.529842">Aix-en-Provence</option>
+<option value="2.295695,49.894171">Amiens</option>
+<option value="-0.551559,47.473988">Angers</option>
+<option value="4.806033,43.949314">Avignon</option>
+<option value="6.024325,47.237953">Besançon</option>
+<option value="-0.580036,44.841225">Bordeaux</option>
+<option value="-4.486009,48.390528">Brest</option>
+<option value="-0.367629,49.182510">Caen</option>
+<option value="1.486639,48.447004">Chartres</option>
+<option value="3.081943,45.777455">Clermont-Ferrand</option>
+<option value="5.041470,47.321581">Dijon</option>
+<option value="2.377252,51.034771">Dunkerque</option>
+<option value="-151.033698,-16.714631">Fare</option>
+<option value="-61.076768,14.603719">Fort-de-France</option>
+<option value="5.721077,45.182478">Grenoble</option>
+<option value="164.944037,-20.689369">Hienghène</option>
+<option value="164.861905,-21.060844">Koné</option>
+<option value="164.281171,-20.561360">Koumac</option>
+<option value="165.826177,-21.709921">La Foa</option>
+<option value="0.107973,49.493898">Le Havre</option>
+<option value="0.199534,48.007778">Le Mans</option>
+<option value="55.291676,-20.935458">Le Port</option>
+<option value="3.070641,50.630509">Lille</option>
+<option value="1.264485,45.835424">Limoges</option>
+<option value="4.832480,45.757529">Lyon</option>
+<option value="5.369953,43.296174">Marseille</option>
+<option value="6.176355,49.119696">Metz</option>
+<option value="3.876734,43.611242">Montpellier</option>
+<option value="7.339936,47.749419">Mulhouse</option>
+<option value="6.183410,48.693722">Nancy</option>
+<option value="-1.560235,47.218516">Nantes</option>
+<option value="7.268391,43.700936">Nice</option>
+<option value="4.360069,43.837425">Nîmes</option>
+<option value="166.442419,-22.274526">Nouméa</option>
+<option value="1.908607,47.902734">Orléans</option>
+<option value="-149.562742,-17.533307">Papeete</option>
+<option value="2.352133,48.856506">Paris</option>
+<option value="-0.368567,43.295755">Pau</option>
+<option value="2.884471,42.695387">Perpignan</option>
+<option value="165.334259,-20.936936">Poindimié</option>
+<option value="0.340196,46.580260">Poitiers</option>
+<option value="4.031926,49.257789">Reims</option>
+<option value="-1.680009,48.111359">Rennes</option>
+<option value="1.093966,49.440459">Rouen</option>
+<option value="55.448137,-20.879989">Saint-Denis</option>
+<option value="4.387306,45.440147">Saint-Étienne</option>
+<option value="7.750713,48.584614">Strasbourg</option>
+<option value="-147.633053,-14.971687">Tiputa</option>
+<option value="5.930492,43.125731">Toulon</option>
+<option value="1.444247,43.604462">Toulouse</option>
+<option value="0.688927,47.390047">Tours</option>
+<option value="4.074626,48.297163">Troyes</option>
+<option value="-139.108274,-9.937972">Vaitahu</option>
+<option value="-151.751654,-16.506798">Vaitape</option>
+<option value="-152.249299,-16.450494">Vai’ea</option>
+</select>				</div>
+								<div class="report_row">
+					<div id="divMap" class="report_map">
+						<div id="geometryLabelerHolder" class="olControlNoSelect">
+							<div id="geometryLabeler">
+								<div id="geometryLabelComment">
+									<span id="geometryLabel">
+										<label>Label:</label> 
+										<input type="text" id="geometry_label" name="geometry_label" value=""  class="lbl_text" />									</span>
+									<span id="geometryComment">
+										<label>Comments:</label> 
+										<input type="text" id="geometry_comment" name="geometry_comment" value=""  class="lbl_text2" />									</span>
+								</div>
+								<div>
+									<span id="geometryColor">
+										<label>Color:</label> 
+										<input type="text" id="geometry_color" name="geometry_color" value=""  class="lbl_text" />									</span>
+									<span id="geometryStrokewidth">
+										<label>Stroke Width:</label> 
+										<select id="geometry_strokewidth" name="geometry_strokewidth" >
+<option value="0.5">0.5</option>
+<option value="1">1</option>
+<option value="1.5">1.5</option>
+<option value="2">2</option>
+<option value="2.5">2.5</option>
+<option value="3">3</option>
+<option value="3.5">3.5</option>
+<option value="4">4</option>
+<option value="4.5">4.5</option>
+<option value="5">5</option>
+<option value="5.5">5.5</option>
+<option value="6">6</option>
+<option value="6.5">6.5</option>
+<option value="7">7</option>
+<option value="7.5">7.5</option>
+<option value="8">8</option>
+</select>									</span>
+									<span id="geometryLat">
+										<label>Latitude:</label> 
+										<input type="text" id="geometry_lat" name="geometry_lat" value=""  class="lbl_text" />									</span>
+									<span id="geometryLon">
+										<label>Longitude:</label> 
+										<input type="text" id="geometry_lon" name="geometry_lon" value=""  class="lbl_text" />									</span>
+								</div>
+							</div>
+							<div id="geometryLabelerClose"></div>
+						</div>
+					</div>
+					<div class="report-find-location">
+						<div id="panel" class="olControlEditingToolbar"></div>
+						<div class="btns">
+							<ul>
+								<li><a href="#" class="btn_del_last">DELETE LAST</a></li>
+								<li><a href="#" class="btn_del_sel">DELETE SELECTED</a></li>
+								<li><a href="#" class="btn_clear">CLEAR MAP</a></li>
+							</ul>
+						</div>
+						<div style="clear:both;"></div>
+						<input type="text" id="location_find" name="location_find" value=""  title="City, State and/or Country" class="findtext" />						<input type="button" name="button" id="button" value="Find Location" class="btn_find" />
+						<div id="find_loading" class="report-find-loading"></div>
+						<div style="clear:both;" id="find_text">* Search for your location using a location name OR latitude,longitude coordinates (format: 38.19, 85.61), OR click on the map to pinpoint the correct location..</div>
+					</div>
+				</div>
+								<div class="report_row">
+					<h4>
+						Location Name 
+						<span class="required">*</span><br />
+						<span class="example">Example: Corner of City Market, 5th Street & 4th Avenue, Johannesburg</span>
+					</h4>
+					<input type="text" id="location_name" name="location_name" value=""  class="text long" />				</div>
+
+				<!-- News Fields -->
+				<div id="divNews" class="report_row">
+					<h4>News Source Link</h4>
+					
+					
+											<div class="report_row">
+							<input type="text" name="incident_news[]" value=""  class="text long2" />							<a href="#" class="add" onClick="addFormField('divNews','incident_news','news_id','text'); return false;">add</a>
+						</div>
+					
+					<input type="hidden" id="news_id" name="news_id" value="1"  />				</div>
+
+
+				<!-- Video Fields -->
+				<div id="divVideo" class="report_row">
+					<h4>External Video Link</h4>
+					
+											<div class="report_row">
+							<input type="text" name="incident_video[]" value=""  class="text long2" />							<a href="#" class="add" onClick="addFormField('divVideo','incident_video','video_id','text'); return false;">add</a>
+						</div>
+					
+					<input type="hidden" id="video_id" name="video_id" value="1"  />				</div>
+				
+				
+				<!-- Photo Fields -->
+				<div id="divPhoto" class="report_row">
+					<h4>Upload Photos</h4>
+					<span class="allowed-html">Maximum filesize: 10Mb</span>
+					
+										<div class="report_row">
+						<input type="file" name="incident_photo[]" value=""  class="file long2" />						<a href="#" class="add" onClick="addFormField('divPhoto', 'incident_photo','photo_id','file'); return false;">add</a>
+					</div>
+					
+					<input type="hidden" id="photo_id" name="photo_id" value="1"  />				</div>
+									
+				<div class="report_row">
+					<input name="submit" type="submit" value="Submit" class="btn_submit" /> 
+				</div>
+			</div>
+		</div>
+		</form>
+		<!-- end report form block -->
+	</div>
+</div>
+			</div>
+		</div>
+		<!-- / main body -->
+
+	</div>
+	<!-- / wrapper -->
+
+	<!-- footer -->
+	<div id="footer" class="clearingfix">
+
+		<div id="underfooter"></div>
+
+		<!-- footer content -->
+		<div class="wrapper floatholder rapidxwpr">
+
+			<!-- footer credits -->
+			<div class="footer-credits">
+				Powered by the &nbsp;
+				<a href="http://www.ushahidi.com/">
+					<img src="http://10.0.4.48/media/img/footer-logo.png" alt="Ushahidi" class="footer-logo" />
+				</a>
+				&nbsp; Platform
+			</div>
+			<!-- / footer credits -->
+
+			<!-- footer menu -->
+			<div class="footermenu">
+				<ul class="clearingfix">
+					<li>
+						<a class="item1" href="http://10.0.4.48/">
+							Home						</a>
+					</li>
+
+										<li>
+						<a href="http://10.0.4.48/reports/submit">
+							Submit a Report						</a>
+					</li>
+										
+					
+					
+									</ul>
+
+						      	
+			</div>
+			<!-- / footer menu -->
+
+
+		</div>
+		<!-- / footer content -->
+
+	</div>
+	<!-- / footer -->
+
+	
+<script type="text/javascript">
+	setTimeout(function() {
+		var statsCollector = document.createElement('img');
+		    statsCollector.src = document.location.protocol + "//tracker.ushahidi.com/piwik/piwik.php?idsite=69897&rec=1";
+		    statsCollector.style.cssText = "width: 1px; height: 1px; opacity: 0.1;";
+		document.body.appendChild(statsCollector);
+	}, 100);
+</script>
+				<!-- Task Scheduler -->
+				<script type="text/javascript">
+				setTimeout(function() {
+					var scheduler = document.createElement('img');
+					    scheduler.src = "http://10.0.4.48/scheduler";
+					    scheduler.style.cssText = "width: 1px; height: 1px; opacity: 0.1;";
+
+					document.body.appendChild(scheduler);
+				}, 200);
+				</script>
+				<!-- End Task Scheduler --></body>
+</html>

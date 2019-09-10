@@ -1,0 +1,734 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+	<title>Neotys Ushahidi</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="stylesheet" type="text/css" href="http://10.0.4.48/media/css/jquery-ui-themeroller.css?m=1430243020&" />
+<link rel="stylesheet" type="text/css" href="http://10.0.4.48/media/css/global.css?m=1430243020&" />
+<link rel="stylesheet" type="text/css" href="http://10.0.4.48/media/css/openlayers.css?m=1430243020&" />
+<link rel="stylesheet" type="text/css" href="http://10.0.4.48/themes/default/css/base.css?m=1430243020&" />
+<link rel="stylesheet" type="text/css" href="http://10.0.4.48/themes/default/css/accordion.css?m=1430243020&" />
+<link rel="stylesheet" type="text/css" href="http://10.0.4.48/themes/default/css/slider.css?m=1430243020&" />
+<link rel="stylesheet" type="text/css" href="http://10.0.4.48/themes/default/css/style.css?m=1430243020&" />
+
+<!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="http://10.0.4.48/themes/default/css/iehacks.css" />
+<![endif]-->
+<!--[if IE 7]><link rel="stylesheet" type="text/css" href="http://10.0.4.48/themes/default/css/ie7hacks.css" />
+<![endif]-->
+<!--[if IE 6]><link rel="stylesheet" type="text/css" href="http://10.0.4.48/themes/default/css/ie6hacks.css" />
+<![endif]-->
+<script type="text/javascript" src="http://10.0.4.48/media/js/jquery.js?m=1430243020&"></script>
+<script type="text/javascript" src="http://10.0.4.48/media/js/jquery.ui.min.js?m=1430243020&"></script>
+<script type="text/javascript" src="http://10.0.4.48/media/js/jquery.pngFix.pack.js?m=1430243020&"></script>
+<script type="text/javascript" src="http://10.0.4.48/media/js/jquery.timeago.js?m=1430243020&"></script>
+<script type="text/javascript" src="http://10.0.4.48/media/js/global.js?m=1430243020&"></script>
+<script type="text/javascript" src="http://10.0.4.48/media/js/OpenLayers.js?m=1430243020&"></script>
+<script type="text/javascript" src="http://10.0.4.48/media/js/ushahidi.js?m=1430243020&"></script>
+<script type="text/javascript" src="https://maps.google.com/maps/api/js?v=3.7&amp;sensor=false&amp;language=en_US"></script>
+<script type="text/javascript" src="http://10.0.4.48/media/js/selectToUISlider.jQuery.js?m=1430243020&"></script>
+<script type="text/javascript">
+//<![CDATA[
+OpenLayers.ImgPath = 'http://10.0.4.48/media/img/openlayers/';
+
+
+//]]>
+</script>
+<script type="text/javascript">
+//<![CDATA[
+		
+// Initialize the Ushahidi namespace
+Ushahidi.baseURL = "http://10.0.4.48/";
+Ushahidi.markerRadius = 4;
+Ushahidi.markerOpacity = 0.8;
+Ushahidi.markerStokeWidth = 2;
+Ushahidi.markerStrokeOpacity = 0.3;
+
+// Default to most active month
+var startTime = 1333238400;
+
+// Default to most active month
+var endTime = 1335830399;
+
+var intervalTime = ''; // HT: manual time interval
+
+// To hold the Ushahidi.Map reference
+var map = null;
+
+
+/**
+ * Toggle Layer Switchers
+ */
+function toggleLayer(link, layer) {
+	if ($("#"+link).text() == "Show")
+	{
+		$("#"+link).text("Hide");
+	}
+	else
+	{
+		$("#"+link).text("Show");
+	}
+	$('#'+layer).toggle(500);
+}
+
+/**
+ * Create a function that calculates the smart columns
+ */
+function smartColumns() {
+	//Reset column size to a 100% once view port has been adjusted
+	$("ul.content-column").css({ 'width' : "100%"});
+
+	//Get the width of row
+	var colWrap = $("ul.content-column").width();
+
+	// Find how many columns of 200px can fit per row / then round it down to a whole number
+	var colNum = 2;
+
+	// Get the width of the row and divide it by the number of columns it 
+	// can fit / then round it down to a whole number. This value will be
+	// the exact width of the re-adjusted column
+	var colFixed = Math.floor(colWrap / colNum);
+
+	// Set exact width of row in pixels instead of using % - Prevents
+	// cross-browser bugs that appear in certain view port resolutions.
+	$("ul.content-column").css({ 'width' : colWrap});
+
+	// Set exact width of the re-adjusted column	
+	$("ul.content-column li").css({ 'width' : colFixed});
+}
+
+/**
+ * Callback function for rendering the timeline
+ */
+function refreshTimeline(options) {
+
+	}
+
+
+jQuery(function() {
+	var reportsURL = "json/cluster";
+
+	// Render thee JavaScript for the base layers so that
+	// they are accessible by Ushahidi.js
+	var google_satellite = new OpenLayers.Layer.Google("Google Maps Satellite", { 
+ type: google.maps.MapTypeId.SATELLITE,
+ animationEnabled: true,
+ sphericalMercator: true,
+ maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)});
+
+var google_hybrid = new OpenLayers.Layer.Google("Google Maps Hybrid", { 
+ type: google.maps.MapTypeId.HYBRID,
+ animationEnabled: true,
+ sphericalMercator: true,
+ maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)});
+
+var google_normal = new OpenLayers.Layer.Google("Google Maps Normal", { 
+ animationEnabled: true,
+ sphericalMercator: true,
+ maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)});
+
+var google_physical = new OpenLayers.Layer.Google("Google Maps Physical", { 
+ type: google.maps.MapTypeId.TERRAIN,
+ animationEnabled: true,
+ sphericalMercator: true,
+ maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)});
+
+	
+	// Map configuration
+	var config = {
+
+		// Zoom level at which to display the map
+		zoom: 3,
+
+		// Redraw the layers when the zoom level changes
+		redrawOnZoom: true,
+
+		// Center of the map
+		center: {
+			latitude: 46.227638,
+			longitude: 2.213749000000007		},
+
+		// Map controls
+		mapControls: [
+			new OpenLayers.Control.Navigation({ dragPanOptions: { enableKinetic: true } }),
+			new OpenLayers.Control.Attribution(),
+			new OpenLayers.Control.Zoom(),
+			new OpenLayers.Control.MousePosition({
+				div: document.getElementById('mapMousePosition'),
+				formatOutput: Ushahidi.convertLongLat
+			}),
+			new OpenLayers.Control.Scale('mapScale'),
+			new OpenLayers.Control.ScaleLine(),
+			new OpenLayers.Control.LayerSwitcher()
+		],
+
+		// Base layers
+		baseLayers: [google_satellite,google_hybrid,google_normal,google_physical],
+
+		// Display the map projection
+		showProjection: true,
+		
+		reportFilters: {
+			s: startTime,
+			e: endTime
+		}
+
+	};
+
+	// Initialize the map
+	map = new Ushahidi.Map('map', config);
+	map.addLayer(Ushahidi.GEOJSON, {
+		name: "Reports",
+		url: reportsURL,
+		transform: false
+	}, true, true);
+
+
+	// Register the referesh timeline function as a callback
+	map.register("filterschanged", refreshTimeline);
+	setTimeout(function() { refreshTimeline({
+		s: startTime,
+		e: endTime
+	}); }, 800);
+
+
+	// Category Switch Action
+	$("ul#category_switch li > a").click(function(e) {
+		
+		var categoryId = this.id.substring(4);
+		var catSet = 'cat_' + this.id.substring(4);
+
+		// Remove All active
+		$("a[id^='cat_']").removeClass("active");
+		
+		// Hide All Children DIV
+		$("[id^='child_']").hide();
+
+		// Add Highlight
+		$("#cat_" + categoryId).addClass("active"); 
+
+		// Show children DIV
+		$("#child_" + categoryId).show();
+		$(this).parents("div").show();
+		
+		// Update report filters
+		map.updateReportFilters({c: categoryId});
+
+		e.stopPropagation();
+		return false;
+	});
+
+	// Layer selection
+	$("ul#kml_switch li > a").click(function(e) {
+		// Get the layer id
+		var layerId = this.id.substring(6);
+
+		var isCurrentLayer = false;
+		var context = this;
+
+		// Remove all actively selected layers
+		$("#kml_switch a").each(function(i) {
+			if ($(this).hasClass("active")) {
+				if (this.id == context.id) {
+					isCurrentLayer = true;
+				}
+				map.trigger("deletelayer", $(".layer-name", this).html());
+				$(this).removeClass("active");
+			}
+		});
+
+		// Was a different layer selected?
+		if (!isCurrentLayer) {
+			// Set the currently selected layer as the active one
+			$(this).addClass("active");
+			map.addLayer(Ushahidi.KML, {
+				name: $(".layer-name", this).html(),
+				url: "json/layer/" + layerId
+			});
+		}
+
+		return false;
+	});
+		
+	// Timeslider and date change actions
+	$("select#startDate, select#endDate").selectToUISlider({
+		labels: 4,
+		labelSrc: 'text',
+		sliderOptions: {
+			change: function(e, ui) {
+				var from = $("#startDate").val();
+				var to = $("#endDate").val();
+				var intrvl = $("#intervalDate").val(); // HT: manual time interval
+
+				if (to > from && (from != startTime || to != endTime || intrvl != intervalTime)) { // HT: manual time interval
+				//if (to > from && (from != startTime || to != endTime)) {
+					// Update the report filters
+					startTime = from;
+					endTime = to;
+					intervalTime = intrvl; // HT: manual time interval
+					map.updateReportFilters({s: from, e: to, i: intrvl}); // HT: manual time interval
+					// map.updateReportFilters({s: from, e: to});
+				}
+
+				e.stopPropagation();
+			}
+		}
+	});
+	
+	// HT: manual time interval trigger timeslider change on interval change
+	$("select#intervalDate").change(function() {
+		$("select#startDate").trigger('change');
+	});
+	
+	// Media Filter Action
+	$('.filters a').click(function() {
+		var mediaType = parseFloat(this.id.replace('media_', '')) || 0;
+		
+		$('.filters a.active').removeClass('active');
+		$(this).addClass('active');
+
+		// Update the report filters
+		map.updateReportFilters({m: mediaType});
+		
+		return false;
+	});
+	
+	//Execute the function when page loads
+	smartColumns();
+
+});
+
+$(window).resize(function () { 
+	//Each time the viewport is adjusted/resized, execute the function
+	smartColumns();
+});
+
+
+//]]>
+</script>
+	
+</head>
+
+
+<body id="page" class="page-main">
+
+	<div id="header_nav">
+	<ul id="header_nav_left">
+		<li><span class="bignext">&raquo;</span><a href="http://10.0.4.48/">Neotys Ushahidi</a></li>
+			</ul>
+
+	
+	<ul id="header_nav_right">
+		<li class="header_nav_user header_nav_has_dropdown">
+		
+			<a href="http://10.0.4.48/login" style="float:right;padding-top:8px;"><span class="header_nav_label"><strong>Login</strong></span></a>
+			
+			<div class="header_nav_dropdown" style="display:none;">
+			
+				<form action="http://10.0.4.48/login" method="post" id="userpass_form">
+<input type="hidden" name="form_auth_token" value="5fed38164fddc11b46076e1d55853040fa2ecf1b30cec05144be0a349b0d5e1a"  />
+
+				<input type="hidden" name="action" value="signin" />
+	
+				<ul>
+					<li><label for="username">Email</label><input type="text" name="username" id="username" class="" /></li>
+	
+					<li><label for="password">Password</label><input name="password" type="password" class="" id="password" size="20" /></li>
+	
+					<li><input type="submit" name="submit" value="Login" class="header_nav_login_btn" /></li>
+				</ul>
+				</form>
+				
+				<ul>
+	
+					<li><a href="http://10.0.4.48/login/?newaccount">Create an Account</a></li>
+	
+					<li><a href="#" id="header_nav_forgot" onclick="return false">Forgot your password?</a>
+						<form action="http://10.0.4.48/login" method="post" id="header_nav_userforgot_form">
+<input type="hidden" name="form_auth_token" value="5fed38164fddc11b46076e1d55853040fa2ecf1b30cec05144be0a349b0d5e1a"  />
+
+						<input type="hidden" name="action" value="forgot" />
+						<label for="resetemail">Registered Email</label>
+						<input type="text" id="resetemail" name="resetemail" value="" />
+	
+						<input type="submit" name="submit" value="Reset Password" class="header_nav_login_btn" />
+						</form>
+	
+					</li>
+				</ul>
+			</div>
+
+				</li>
+	</ul>
+</div>
+	<!-- wrapper -->
+	<div class="wrapper floatholder rapidxwpr">
+
+		<!-- header -->
+		<div id="header">
+
+			<!-- searchbox -->
+			<div id="searchbox">
+
+				<!-- languages -->
+				<div class="language-box"><form action="http://10.0.4.48/main" method="get">
+<select id="l" name="l"  onchange="this.form.submit()" >
+<option value="af">Afrikaans</option>
+<option value="az_AZ">Azərbaycan dili (AZ)</option>
+<option value="id_ID">Bahasa Indonesia (ID)</option>
+<option value="bs_BA">Bosanski (BA)</option>
+<option value="ca_ES">Català (ES)</option>
+<option value="sn">chiShona</option>
+<option value="cy">Cymraeg</option>
+<option value="cy_GB">Cymraeg (GB)</option>
+<option value="da">Dansk</option>
+<option value="de_DE">Deutsch (DE)</option>
+<option value="en_GB">English (GB)</option>
+<option value="en_US" selected="selected">English (US)</option>
+<option value="es_AR">Español (AR)</option>
+<option value="es_CL">Español (CL)</option>
+<option value="es_ES">Español (ES)</option>
+<option value="es_PE">Español (PE)</option>
+<option value="es_VE">Español (VE)</option>
+<option value="eu">Euskara</option>
+<option value="fr_FR">Français (FR)</option>
+<option value="ga_IE">Gaeilge (IE)</option>
+<option value="gl">Galego</option>
+<option value="hr">hrvatski</option>
+<option value="it_IT">Italiano (IT)</option>
+<option value="sw_KE">Kiswahili (KE)</option>
+<option value="ht_HT">Kreyòl ayisyen (HT)</option>
+<option value="ku">Kurdî, كوردی‎</option>
+<option value="ku_IQ">Kurdî, كوردی‎ (IQ)</option>
+<option value="lt">Lietuvių</option>
+<option value="lg">Luganda</option>
+<option value="hu_HU">Magyar (HU)</option>
+<option value="nl_NL">Nederlands (NL)</option>
+<option value="no">Norsk</option>
+<option value="pl_PL">Polski (PL)</option>
+<option value="pt_BR">Português (BR)</option>
+<option value="pt_PT">Português (PT)</option>
+<option value="pr_US">pr (US)</option>
+<option value="ro_RO">română (RO)</option>
+<option value="sq_AL">Shqip (AL)</option>
+<option value="sk">Slovenčina</option>
+<option value="sk_SK">Slovenčina (SK)</option>
+<option value="sl_SI">Slovenščina (SI)</option>
+<option value="so">Soomaaliga, af Soomaali</option>
+<option value="fi">Suomi</option>
+<option value="sv_SE">Svenska (SE)</option>
+<option value="vi">Tiếng Việt</option>
+<option value="vi_VN">Tiếng Việt (VN)</option>
+<option value="tr_TR">Türkçe (TR)</option>
+<option value="cs_CZ">česky, čeština (CZ)</option>
+<option value="el">Ελληνικά</option>
+<option value="bg_BG">Български (BG)</option>
+<option value="mk_MK">Македонски (MK)</option>
+<option value="ru_RU">Русский (RU)</option>
+<option value="sr">Српски</option>
+<option value="sr_RS">Српски (RS)</option>
+<option value="uk">Українська</option>
+<option value="uk_UA">Українська (UA)</option>
+<option value="hy_AM">Հայերեն (AM)</option>
+<option value="he_IL">עברית (IL)</option>
+<option value="ur_PK">اردو (PK)</option>
+<option value="ar">العربية</option>
+<option value="ar_EG">العربية (EG)</option>
+<option value="fa">فارسی</option>
+<option value="ps">پښتو</option>
+<option value="dv">ދިވެހި</option>
+<option value="ne_NP">नेपाली (NP)</option>
+<option value="sa">संस्कृतम्</option>
+<option value="hi_IN">हिन्दी, हिंदी (IN)</option>
+<option value="bn">বাংলা</option>
+<option value="bn_BD">বাংলা (BD)</option>
+<option value="pa">ਪੰਜਾਬੀ, پنجابی‎</option>
+<option value="te">తెలుగు</option>
+<option value="si">සිංහල</option>
+<option value="th_TH">ไทย (TH)</option>
+<option value="ka_GE">ქართული (GE)</option>
+<option value="am">አማርኛ</option>
+<option value="km">ភាសាខ្មែរ</option>
+<option value="zh">中文 (Zhōngwén), 汉语, 漢語</option>
+<option value="zh_CN">中文 (Zhōngwén), 汉语, 漢語 (CN)</option>
+<option value="zh_TW">中文 (Zhōngwén), 汉语, 漢語 (TW)</option>
+<option value="ja_JP">日本語 (にほんご／にっぽんご) (JP)</option>
+<option value="ko_KR">한국어 (韓國語), 조선말 (朝鮮語) (KR)</option>
+</select></form>
+</div>				<!-- / languages -->
+
+				<!-- searchform -->
+				<div class="search-form"><form action="http://10.0.4.48/search" method="get" id="search">
+<ul><li><input type="text" name="k" value="" class="text" /></li><li><input type="submit" name="b" class="searchbtn" value="Search" /></li></ul></form>
+</div>				<!-- / searchform -->
+
+			</div>
+			<!-- / searchbox -->
+
+			<!-- logo -->
+						<a href="http://10.0.4.48/"><img src="http://10.0.4.48/media/uploads/banner_1437742016.png" alt="Neotys Ushahidi" /></a>
+						<!-- / logo -->
+
+			<!-- submit incident -->
+			<div class="submit-incident clearingfix"><a href="http://10.0.4.48/reports/submit">Submit a Report</a></div>			<!-- / submit incident -->
+
+		</div>
+		<!-- / header -->
+        <!-- / header item for plugins -->
+        
+		<!-- main body -->
+		<div id="middle">
+			<div class="background layoutleft">
+
+				<!-- mainmenu -->
+				<div id="mainmenu" class="clearingfix">
+					<ul>
+						<li><a href="http://10.0.4.48/main" class="active">Home</a></li><li><a href="http://10.0.4.48/reports">Reports</a></li><li><a href="http://10.0.4.48/reports/submit">Submit a Report</a></li>					</ul>
+
+					
+				</div>
+				<!-- / mainmenu -->
+<!-- main body -->
+<div id="main" class="clearingfix">
+	<div id="mainmiddle" class="floatbox withright">
+
+	
+		<!-- right column -->
+		<div id="right" class="clearingfix">
+			
+			
+			<!-- category filters -->
+			<div class="cat-filters clearingfix">
+				<strong>
+					Category Filter					<span>
+						[<a href="javascript:toggleLayer('category_switch_link', 'category_switch')" id="category_switch_link">
+							Hide						</a>]
+					</span>
+				</strong>
+			</div>
+
+			<ul id="category_switch" class="category-filters">
+								<li>
+					<a class="active" id="cat_0" href="#">
+						<span class="category-icon"><img src="http://10.0.4.48/media/uploads/default_map_all_1437742499_m.png" /></span>
+						<span class="category-title">All Categories</span>
+					</a>
+				</li>
+				<li><a href="#" id="cat_1" title="Cyclone"><span class="category-icon swatch" style="background-color:#9900CC"></span><span class="category-title">Cyclone</span></a><div class="hide" id="child_1"></div></li><li><a href="#" id="cat_2" title="Avalanche"><span class="category-icon swatch" style="background-color:#3300FF"></span><span class="category-title">Avalanche</span></a><div class="hide" id="child_2"></div></li><li><a href="#" id="cat_3" title="Fire"><span class="category-icon swatch" style="background-color:#663300"></span><span class="category-title">Fire</span></a><div class="hide" id="child_3"></div></li>			</ul>
+			<!-- / category filters -->
+
+						
+			
+			<br />
+
+			<!-- additional content -->
+							<div class="additional-content">
+					<h5>How to Report</h5>
+
+					<div class="how-to-report-methods">
+
+						<!-- Phone -->
+												
+						<!-- External Apps -->
+												<div>
+							<strong>By using an app:</strong><br/>
+															<a href="http://download.ushahidi.com/track_download.php?download=ios">iPhone</a><br/>
+															<a href="http://download.ushahidi.com/track_download.php?download=android">Android</a><br/>
+													</div>
+						
+						<!-- Email -->
+												<div>
+							<strong>By sending an email:</strong><br/>
+							<a href="mailto:ps@neotys.com">ps@neotys.com</a>
+						</div>
+						
+						<!-- Twitter -->
+						
+						<!-- Web Form -->
+						<div>
+							<a href="http://10.0.4.48/reports/submit/">
+								By filling this form on our website.							</a>
+						</div>
+
+					</div>
+
+				</div>
+			
+			<!-- / additional content -->
+			
+				
+		</div>
+		<!-- / right column -->
+	
+		<!-- content column -->
+		<div id="content" class="clearingfix">
+			<div class="floatbox">
+
+				<!-- filters -->
+				<div class="filters clearingfix">
+					<div class="media-filters">
+						<strong>Filters</strong>
+						<ul>
+							<li><a id="media_0" class="active" href="#"><span>All</span></a></li>
+							<li><a id="media_4" href="#"><span>News</span></a></li>
+							<li><a id="media_1" href="#"><span>Pictures</span></a></li>
+							<li><a id="media_2" href="#"><span>Video</span></a></li>
+						</ul>
+					</div>
+
+
+									</div>
+				<!-- / filters -->
+
+				<!-- map -->
+<div class="map " id="map"></div>
+<div style="clear:both;"></div>
+<div id="mapStatus">
+	<div id="mapScale"></div>
+	<div id="mapMousePosition"></div>
+	<div id="mapProjection"></div>
+	<div id="mapOutput"></div>
+</div>
+<div style="clear:both;"></div>
+<!-- / map --><div class="slider-holder">
+	<form action="http://10.0.4.48/main" method="get">
+		<input type="hidden" value="0" name="currentCat" id="currentCat"/>
+		<fieldset>
+			<!-- HT: More info link -->
+			<a class="f-clear" href="#" id="timelineMoreLink" style="font-size: 11px;">More Information</a>
+			<!-- HT: Manual time interval for timeline select input -->
+			<label for="intervalDate">Interval:</label>
+			<select name="intervalDate" id="intervalDate"><option value="">Auto</option><option value="hour">Hourly</option><option value="day">Daily</option><option value="week">Weekly</option><option value="month">Monthly</option></select>
+			<!-- HT: End of manual time interval for timeline select input -->
+			<label for="startDate">From:</label>
+			<select name="startDate" id="startDate"><optgroup label="2012"><option value="1333238400" selected="selected" >Apr 2012</option></optgroup></select>
+			<label for="endDate">to:</label>
+			<select name="endDate" id="endDate"><optgroup label="2012"><option value="1335830399" selected="selected" >Apr 2012</option></optgroup></select>
+		</fieldset>
+	</form>
+</div>
+			</div>
+		</div>
+		<!-- / content column -->
+
+	</div>
+</div>
+<!-- / main body -->
+
+<!-- content -->
+<div class="content-container">
+
+	<!-- content blocks -->
+	<div class="content-blocks clearingfix">
+		<ul class="content-column">
+			<li id="block-news"><div class="content-block"><h5>Official &amp; mainstream news</h5><table class="table-list">
+	<thead>
+		<tr>
+			<th scope="col">Title </th>
+			<th scope="col">Source</th>
+			<th scope="col">Date</th>
+		</tr>
+	</thead>
+	<tbody>
+					<tr><td colspan="3"></td></tr>
+				</tbody>
+</table>
+<a class="more" href="http://10.0.4.48/feeds">View More</a>
+<div class="clear:both;"></div>
+</div></li><li id="block-reports"><div class="content-block"><h5>Reports <span>(from the map, listed in chronological order)</span></h5><table class="table-list">
+	<thead>
+		<tr>
+			<th scope="col" class="title">Title </th>
+			<th scope="col" class="location">Location</th>
+			<th scope="col" class="date">Date</th>
+		</tr>
+	</thead>
+	<tbody>
+				<tr>
+			<td><a href="http://10.0.4.48/reports/view/1"> Hello Ushahidi!</a></td>
+			<td>Nairobi</td>
+			<td>Apr 4 2012</td>
+		</tr>
+			</tbody>
+</table>
+<a class="more" href="http://10.0.4.48/reports/">View More</a>
+<div style="clear:both;"></div>
+</div></li>		</ul>
+	</div>
+	<!-- /content blocks -->
+
+</div>
+<!-- content -->
+			</div>
+		</div>
+		<!-- / main body -->
+
+	</div>
+	<!-- / wrapper -->
+
+	<!-- footer -->
+	<div id="footer" class="clearingfix">
+
+		<div id="underfooter"></div>
+
+		<!-- footer content -->
+		<div class="wrapper floatholder rapidxwpr">
+
+			<!-- footer credits -->
+			<div class="footer-credits">
+				Powered by the &nbsp;
+				<a href="http://www.ushahidi.com/">
+					<img src="http://10.0.4.48/media/img/footer-logo.png" alt="Ushahidi" class="footer-logo" />
+				</a>
+				&nbsp; Platform
+			</div>
+			<!-- / footer credits -->
+
+			<!-- footer menu -->
+			<div class="footermenu">
+				<ul class="clearingfix">
+					<li>
+						<a class="item1" href="http://10.0.4.48/">
+							Home						</a>
+					</li>
+
+										<li>
+						<a href="http://10.0.4.48/reports/submit">
+							Submit a Report						</a>
+					</li>
+										
+					
+					
+									</ul>
+
+						      	
+			</div>
+			<!-- / footer menu -->
+
+
+		</div>
+		<!-- / footer content -->
+
+	</div>
+	<!-- / footer -->
+
+	
+<script type="text/javascript">
+	setTimeout(function() {
+		var statsCollector = document.createElement('img');
+		    statsCollector.src = document.location.protocol + "//tracker.ushahidi.com/piwik/piwik.php?idsite=69897&rec=1";
+		    statsCollector.style.cssText = "width: 1px; height: 1px; opacity: 0.1;";
+		document.body.appendChild(statsCollector);
+	}, 100);
+</script>
+				<!-- Task Scheduler -->
+				<script type="text/javascript">
+				setTimeout(function() {
+					var scheduler = document.createElement('img');
+					    scheduler.src = "http://10.0.4.48/scheduler";
+					    scheduler.style.cssText = "width: 1px; height: 1px; opacity: 0.1;";
+
+					document.body.appendChild(scheduler);
+				}, 200);
+				</script>
+				<!-- End Task Scheduler --></body>
+</html>

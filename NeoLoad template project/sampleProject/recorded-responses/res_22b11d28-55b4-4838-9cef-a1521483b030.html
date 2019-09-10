@@ -1,0 +1,296 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+	<title>Neotys Ushahidi</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="stylesheet" type="text/css" href="http://10.0.4.48/media/css/jquery-ui-themeroller.css?m=1430243020&" />
+<link rel="stylesheet" type="text/css" href="http://10.0.4.48/media/css/global.css?m=1430243020&" />
+<link rel="stylesheet" type="text/css" href="http://10.0.4.48/themes/default/css/base.css?m=1430243020&" />
+<link rel="stylesheet" type="text/css" href="http://10.0.4.48/themes/default/css/accordion.css?m=1430243020&" />
+<link rel="stylesheet" type="text/css" href="http://10.0.4.48/themes/default/css/slider.css?m=1430243020&" />
+<link rel="stylesheet" type="text/css" href="http://10.0.4.48/themes/default/css/style.css?m=1430243020&" />
+
+<!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="http://10.0.4.48/themes/default/css/iehacks.css" />
+<![endif]-->
+<!--[if IE 7]><link rel="stylesheet" type="text/css" href="http://10.0.4.48/themes/default/css/ie7hacks.css" />
+<![endif]-->
+<!--[if IE 6]><link rel="stylesheet" type="text/css" href="http://10.0.4.48/themes/default/css/ie6hacks.css" />
+<![endif]-->
+<script type="text/javascript" src="http://10.0.4.48/media/js/jquery.js?m=1430243020&"></script>
+<script type="text/javascript" src="http://10.0.4.48/media/js/jquery.ui.min.js?m=1430243020&"></script>
+<script type="text/javascript" src="http://10.0.4.48/media/js/jquery.pngFix.pack.js?m=1430243020&"></script>
+<script type="text/javascript" src="http://10.0.4.48/media/js/jquery.timeago.js?m=1430243020&"></script>
+<script type="text/javascript" src="http://10.0.4.48/media/js/global.js?m=1430243020&"></script>
+	
+</head>
+
+
+<body id="page" class="page-reports-thanks">
+
+	<div id="header_nav">
+	<ul id="header_nav_left">
+		<li><span class="bignext">&raquo;</span><a href="http://10.0.4.48/">Neotys Ushahidi</a></li>
+			</ul>
+
+	
+	<ul id="header_nav_right">
+		<li class="header_nav_user header_nav_has_dropdown">
+		
+			<a href="http://10.0.4.48/login" style="float:right;padding-top:8px;"><span class="header_nav_label"><strong>Login</strong></span></a>
+			
+			<div class="header_nav_dropdown" style="display:none;">
+			
+				<form action="http://10.0.4.48/login" method="post" id="userpass_form">
+<input type="hidden" name="form_auth_token" value="5fed38164fddc11b46076e1d55853040fa2ecf1b30cec05144be0a349b0d5e1a"  />
+
+				<input type="hidden" name="action" value="signin" />
+	
+				<ul>
+					<li><label for="username">Email</label><input type="text" name="username" id="username" class="" /></li>
+	
+					<li><label for="password">Password</label><input name="password" type="password" class="" id="password" size="20" /></li>
+	
+					<li><input type="submit" name="submit" value="Login" class="header_nav_login_btn" /></li>
+				</ul>
+				</form>
+				
+				<ul>
+	
+					<li><a href="http://10.0.4.48/login/?newaccount">Create an Account</a></li>
+	
+					<li><a href="#" id="header_nav_forgot" onclick="return false">Forgot your password?</a>
+						<form action="http://10.0.4.48/login" method="post" id="header_nav_userforgot_form">
+<input type="hidden" name="form_auth_token" value="5fed38164fddc11b46076e1d55853040fa2ecf1b30cec05144be0a349b0d5e1a"  />
+
+						<input type="hidden" name="action" value="forgot" />
+						<label for="resetemail">Registered Email</label>
+						<input type="text" id="resetemail" name="resetemail" value="" />
+	
+						<input type="submit" name="submit" value="Reset Password" class="header_nav_login_btn" />
+						</form>
+	
+					</li>
+				</ul>
+			</div>
+
+				</li>
+	</ul>
+</div>
+	<!-- wrapper -->
+	<div class="wrapper floatholder rapidxwpr">
+
+		<!-- header -->
+		<div id="header">
+
+			<!-- searchbox -->
+			<div id="searchbox">
+
+				<!-- languages -->
+				<div class="language-box"><form action="http://10.0.4.48/reports/thanks" method="get">
+<select id="l" name="l"  onchange="this.form.submit()" >
+<option value="af">Afrikaans</option>
+<option value="az_AZ">Azərbaycan dili (AZ)</option>
+<option value="id_ID">Bahasa Indonesia (ID)</option>
+<option value="bs_BA">Bosanski (BA)</option>
+<option value="ca_ES">Català (ES)</option>
+<option value="sn">chiShona</option>
+<option value="cy">Cymraeg</option>
+<option value="cy_GB">Cymraeg (GB)</option>
+<option value="da">Dansk</option>
+<option value="de_DE">Deutsch (DE)</option>
+<option value="en_GB">English (GB)</option>
+<option value="en_US" selected="selected">English (US)</option>
+<option value="es_AR">Español (AR)</option>
+<option value="es_CL">Español (CL)</option>
+<option value="es_ES">Español (ES)</option>
+<option value="es_PE">Español (PE)</option>
+<option value="es_VE">Español (VE)</option>
+<option value="eu">Euskara</option>
+<option value="fr_FR">Français (FR)</option>
+<option value="ga_IE">Gaeilge (IE)</option>
+<option value="gl">Galego</option>
+<option value="hr">hrvatski</option>
+<option value="it_IT">Italiano (IT)</option>
+<option value="sw_KE">Kiswahili (KE)</option>
+<option value="ht_HT">Kreyòl ayisyen (HT)</option>
+<option value="ku">Kurdî, كوردی‎</option>
+<option value="ku_IQ">Kurdî, كوردی‎ (IQ)</option>
+<option value="lt">Lietuvių</option>
+<option value="lg">Luganda</option>
+<option value="hu_HU">Magyar (HU)</option>
+<option value="nl_NL">Nederlands (NL)</option>
+<option value="no">Norsk</option>
+<option value="pl_PL">Polski (PL)</option>
+<option value="pt_BR">Português (BR)</option>
+<option value="pt_PT">Português (PT)</option>
+<option value="pr_US">pr (US)</option>
+<option value="ro_RO">română (RO)</option>
+<option value="sq_AL">Shqip (AL)</option>
+<option value="sk">Slovenčina</option>
+<option value="sk_SK">Slovenčina (SK)</option>
+<option value="sl_SI">Slovenščina (SI)</option>
+<option value="so">Soomaaliga, af Soomaali</option>
+<option value="fi">Suomi</option>
+<option value="sv_SE">Svenska (SE)</option>
+<option value="vi">Tiếng Việt</option>
+<option value="vi_VN">Tiếng Việt (VN)</option>
+<option value="tr_TR">Türkçe (TR)</option>
+<option value="cs_CZ">česky, čeština (CZ)</option>
+<option value="el">Ελληνικά</option>
+<option value="bg_BG">Български (BG)</option>
+<option value="mk_MK">Македонски (MK)</option>
+<option value="ru_RU">Русский (RU)</option>
+<option value="sr">Српски</option>
+<option value="sr_RS">Српски (RS)</option>
+<option value="uk">Українська</option>
+<option value="uk_UA">Українська (UA)</option>
+<option value="hy_AM">Հայերեն (AM)</option>
+<option value="he_IL">עברית (IL)</option>
+<option value="ur_PK">اردو (PK)</option>
+<option value="ar">العربية</option>
+<option value="ar_EG">العربية (EG)</option>
+<option value="fa">فارسی</option>
+<option value="ps">پښتو</option>
+<option value="dv">ދިވެހި</option>
+<option value="ne_NP">नेपाली (NP)</option>
+<option value="sa">संस्कृतम्</option>
+<option value="hi_IN">हिन्दी, हिंदी (IN)</option>
+<option value="bn">বাংলা</option>
+<option value="bn_BD">বাংলা (BD)</option>
+<option value="pa">ਪੰਜਾਬੀ, پنجابی‎</option>
+<option value="te">తెలుగు</option>
+<option value="si">සිංහල</option>
+<option value="th_TH">ไทย (TH)</option>
+<option value="ka_GE">ქართული (GE)</option>
+<option value="am">አማርኛ</option>
+<option value="km">ភាសាខ្មែរ</option>
+<option value="zh">中文 (Zhōngwén), 汉语, 漢語</option>
+<option value="zh_CN">中文 (Zhōngwén), 汉语, 漢語 (CN)</option>
+<option value="zh_TW">中文 (Zhōngwén), 汉语, 漢語 (TW)</option>
+<option value="ja_JP">日本語 (にほんご／にっぽんご) (JP)</option>
+<option value="ko_KR">한국어 (韓國語), 조선말 (朝鮮語) (KR)</option>
+</select></form>
+</div>				<!-- / languages -->
+
+				<!-- searchform -->
+				<div class="search-form"><form action="http://10.0.4.48/search" method="get" id="search">
+<ul><li><input type="text" name="k" value="" class="text" /></li><li><input type="submit" name="b" class="searchbtn" value="Search" /></li></ul></form>
+</div>				<!-- / searchform -->
+
+			</div>
+			<!-- / searchbox -->
+
+			<!-- logo -->
+						<a href="http://10.0.4.48/"><img src="http://10.0.4.48/media/uploads/banner_1437742016.png" alt="Neotys Ushahidi" /></a>
+						<!-- / logo -->
+
+			<!-- submit incident -->
+			<div class="submit-incident clearingfix"><a href="http://10.0.4.48/reports/submit">Submit a Report</a></div>			<!-- / submit incident -->
+
+		</div>
+		<!-- / header -->
+        <!-- / header item for plugins -->
+        
+		<!-- main body -->
+		<div id="middle">
+			<div class="background layoutleft">
+
+				<!-- mainmenu -->
+				<div id="mainmenu" class="clearingfix">
+					<ul>
+						<li><a href="http://10.0.4.48/main">Home</a></li><li><a href="http://10.0.4.48/reports">Reports</a></li><li><a href="http://10.0.4.48/reports/submit" class="active">Submit a Report</a></li>					</ul>
+
+					
+				</div>
+				<!-- / mainmenu -->
+<div id="content">
+	<div class="content-bg">
+		<!-- start block -->
+		<div class="big-block">
+			<!-- green-box -->
+			<div class="green-box">
+				<h3>Your Report has been submitted to our staff for review. We will get back to you shortly if necessary.</h3>
+
+				<div class="thanks_msg"><a href="http://10.0.4.48/reports">Return to the reports page</a><br /><br />
+					<a href="http://10.0.4.48/reports/submit">Submit a New Report</a><br /><br />
+					Please give us feedback about your experience by sending an email to <a href="mailto:ps@neotys.com">ps@neotys.com</a><br /><br />
+				</div>
+			</div>
+		</div>
+		<!-- end block -->
+	</div>
+</div>
+			</div>
+		</div>
+		<!-- / main body -->
+
+	</div>
+	<!-- / wrapper -->
+
+	<!-- footer -->
+	<div id="footer" class="clearingfix">
+
+		<div id="underfooter"></div>
+
+		<!-- footer content -->
+		<div class="wrapper floatholder rapidxwpr">
+
+			<!-- footer credits -->
+			<div class="footer-credits">
+				Powered by the &nbsp;
+				<a href="http://www.ushahidi.com/">
+					<img src="http://10.0.4.48/media/img/footer-logo.png" alt="Ushahidi" class="footer-logo" />
+				</a>
+				&nbsp; Platform
+			</div>
+			<!-- / footer credits -->
+
+			<!-- footer menu -->
+			<div class="footermenu">
+				<ul class="clearingfix">
+					<li>
+						<a class="item1" href="http://10.0.4.48/">
+							Home						</a>
+					</li>
+
+										<li>
+						<a href="http://10.0.4.48/reports/submit">
+							Submit a Report						</a>
+					</li>
+										
+					
+					
+									</ul>
+
+						      	
+			</div>
+			<!-- / footer menu -->
+
+
+		</div>
+		<!-- / footer content -->
+
+	</div>
+	<!-- / footer -->
+
+	
+<script type="text/javascript">
+	setTimeout(function() {
+		var statsCollector = document.createElement('img');
+		    statsCollector.src = document.location.protocol + "//tracker.ushahidi.com/piwik/piwik.php?idsite=69897&rec=1";
+		    statsCollector.style.cssText = "width: 1px; height: 1px; opacity: 0.1;";
+		document.body.appendChild(statsCollector);
+	}, 100);
+</script>
+				<!-- Task Scheduler -->
+				<script type="text/javascript">
+				setTimeout(function() {
+					var scheduler = document.createElement('img');
+					    scheduler.src = "http://10.0.4.48/scheduler";
+					    scheduler.style.cssText = "width: 1px; height: 1px; opacity: 0.1;";
+
+					document.body.appendChild(scheduler);
+				}, 200);
+				</script>
+				<!-- End Task Scheduler --></body>
+</html>

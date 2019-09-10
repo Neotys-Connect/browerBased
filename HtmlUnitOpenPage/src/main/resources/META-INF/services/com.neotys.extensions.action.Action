@@ -1,0 +1,8 @@
+com.neotys.htmlunit.customActions.OpenPageAction
+com.neotys.htmlunit.customActions.ClickOnElementByIDAction
+com.neotys.htmlunit.customActions.ClickOnElementByClassAction
+com.neotys.htmlunit.customActions.ClickElementByXpathAction
+com.neotys.htmlunit.customActions.SetTextonElementByIDAction
+com.neotys.htmlunit.customActions.SelectItemFromListByIdAction
+com.neotys.htmlunit.customActions.SelectItemFromListByNameAction
+com.neotys.htmlunit.customActions.CloseBrowserAction

@@ -1,0 +1,11 @@
+GET http://10.0.4.48/json/cluster?s=1333238400&e=1335830399&z=3 HTTP/1.1
+Accept: */*
+X-Requested-With: XMLHttpRequest
+Referer: http://10.0.4.48/
+Accept-Language: fr-FR
+Accept-Encoding: gzip, deflate
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; MDDRJS; rv:11.0) like Gecko
+Proxy-Connection: Keep-Alive
+Host: 10.0.4.48
+Cookie: ushahidi=bkkc45pt5rrhav0j9jqtt1gcf4
+

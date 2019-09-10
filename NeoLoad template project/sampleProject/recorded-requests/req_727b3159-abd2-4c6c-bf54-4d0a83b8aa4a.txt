@@ -1,0 +1,8 @@
+GET http://10.0.4.48/ HTTP/1.1
+Accept: text/html, application/xhtml+xml, */*
+Accept-Language: fr-FR
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; MDDRJS; rv:11.0) like Gecko
+Accept-Encoding: gzip, deflate
+Proxy-Connection: Keep-Alive
+Host: 10.0.4.48
+

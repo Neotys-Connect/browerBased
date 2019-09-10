@@ -1,0 +1,151 @@
+POST http://10.0.4.48/reports/submit HTTP/1.1
+Accept: text/html, application/xhtml+xml, */*
+Referer: http://10.0.4.48/reports/submit
+Accept-Language: fr-FR
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; MDDRJS; rv:11.0) like Gecko
+Content-Type: multipart/form-data; boundary=---------------------------7df3123910e14
+Accept-Encoding: gzip, deflate
+Host: 10.0.4.48
+Content-Length: 3893
+Proxy-Connection: Keep-Alive
+Pragma: no-cache
+Cookie: ushahidi=bkkc45pt5rrhav0j9jqtt1gcf4
+
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="form_auth_token"
+
+5fed38164fddc11b46076e1d55853040fa2ecf1b30cec05144be0a349b0d5e1a
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="latitude"
+
+40.4167047
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="longitude"
+
+-3.7035825
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="country_name"
+
+Spain
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="incident_zoom"
+
+3
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="form_id"
+
+
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="incident_title"
+
+ttile of the report
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="incident_description"
+
+description of the report
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="incident_date"
+
+07/27/2015
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="incident_hour"
+
+08
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="incident_minute"
+
+06
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="incident_ampm"
+
+am
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="incident_category[]"
+
+1
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="person_first"
+
+neotys
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="person_last"
+
+neoload
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="person_email"
+
+
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="select_city"
+
+
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="geometry_label"
+
+
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="geometry_comment"
+
+
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="geometry_color"
+
+
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="geometry_strokewidth"
+
+0.5
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="geometry_lat"
+
+
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="geometry_lon"
+
+
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="OpenLayers_Control_LayerSwitcher_27_baseLayers"
+
+Google Maps Satellite
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="Editable"
+
+Editable
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="location_find"
+
+madrid
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="location_name"
+
+Madrid, Área metropolitana de Madrid y Corredor del Henares, Madrid, Community of Madrid, Spain
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="incident_news[]"
+
+
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="news_id"
+
+1
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="incident_video[]"
+
+
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="video_id"
+
+1
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="incident_photo[]"; filename=""
+Content-Type: application/octet-stream
+
+
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="photo_id"
+
+1
+-----------------------------7df3123910e14
+Content-Disposition: form-data; name="submit"
+
+Submit
+-----------------------------7df3123910e14--

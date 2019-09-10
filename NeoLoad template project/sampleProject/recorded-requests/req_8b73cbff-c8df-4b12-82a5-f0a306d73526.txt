@@ -1,0 +1,13 @@
+POST http://192.168.100.102/api?task=report HTTP/1.1
+Host: 192.168.100.102
+Proxy-Connection: keep-alive
+Accept-Encoding: gzip, deflate
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 328
+Accept-Language: en-us
+Pragma: no-cache
+Accept: */*
+Connection: keep-alive
+User-Agent: Ushahidi/3.7 CFNetwork/672.0.8 Darwin/14.0.0
+
+incident_ampm=am&resp=json&incident_description=Hhhhh&location_name=Z.A.%20les%20Paluds%201%20et%202,%20Aubagne,%20Provence-Alpes-C%C3%B4te%20d'Azur,%20France&incident_title=Ffffff&longitude=5.599043882755301&incident_hour=11&latitude=43.29086484748366&incident_category=1&incident_date=01/20/2014&task=report&incident_minute=49
