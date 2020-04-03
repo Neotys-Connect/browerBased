@@ -53,6 +53,8 @@ public final class OpenPageActionEngine implements ActionEngine {
 		final Optional<String> proxyHost=parsedArgs.get(OpenPageActionOption.ProxyHost.getName());
 		final Optional<String> proxyPort=parsedArgs.get(OpenPageActionOption.ProxyPORT.getName());
 		final Optional<String> performance=parsedArgs.get(OpenPageActionOption.Performance.getName());
+		final Optional<String> clearcache=parsedArgs.get(OpenPageActionOption.ClearCache.getName());
+		final Optional<String> clearcookies=parsedArgs.get(OpenPageActionOption.ClearCookie.getName());
 
 		final Optional<String> tracemode=parsedArgs.get((OpenPageActionOption.TraceMode.getName()));
 
@@ -69,7 +71,7 @@ public final class OpenPageActionEngine implements ActionEngine {
 
 			neoLoadBrowserEngine= (NeoLoadBrowserEngine) context.getCurrentVirtualUser().get("NeoLoadBrowser");
 			if(neoLoadBrowserEngine==null) {
-				BrowserContext browserContext = new BrowserContext(tracemode, context, Optional.<String>absent(), performance);
+				BrowserContext browserContext = new BrowserContext(tracemode, context, Optional.<String>absent(), performance,clearcache,clearcookies);
 				neoLoadBrowserEngine = new NeoLoadBrowserEngine(proxyHost, proxyPort, browserVersion, browserContext);
 				context.getCurrentVirtualUser().put("NeoLoadBrowser", neoLoadBrowserEngine);
 			}
@@ -78,6 +80,8 @@ public final class OpenPageActionEngine implements ActionEngine {
 				neoLoadBrowserEngine.getContext().setContext(context);
 				neoLoadBrowserEngine.getContext().setTracemode(tracemode);
 				neoLoadBrowserEngine.getContext().setPerformance(performance);
+				neoLoadBrowserEngine.getContext().setClearCookies(clearcookies);
+				neoLoadBrowserEngine.getContext().setClearcache(clearcache);
 			}
 			String output=neoLoadBrowserEngine.loadPage(btUrl,sampleResult);
 

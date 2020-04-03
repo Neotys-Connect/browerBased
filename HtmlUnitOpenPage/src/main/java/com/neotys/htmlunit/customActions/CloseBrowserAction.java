@@ -40,7 +40,7 @@ public class CloseBrowserAction implements Action {
 
     @Override
     public Class<? extends ActionEngine> getEngineClass() {
-        return OpenPageActionEngine.class;
+        return CloseBrowserActionEngine.class;
     }
 
     @Override

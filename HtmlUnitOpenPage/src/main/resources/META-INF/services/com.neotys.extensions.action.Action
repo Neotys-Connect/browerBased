@@ -6,3 +6,4 @@ com.neotys.htmlunit.customActions.SetTextonElementByIDAction
 com.neotys.htmlunit.customActions.SelectItemFromListByIdAction
 com.neotys.htmlunit.customActions.SelectItemFromListByNameAction
 com.neotys.htmlunit.customActions.CloseBrowserAction
+com.neotys.htmlunit.customActions.ClickOnLinkByHrefAction

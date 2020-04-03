@@ -39,6 +39,8 @@ public class ClickElementByXpathActionEngine implements ActionEngine {
 
         final String xpath = parsedArgs.get(ClickElementByXpathOption.Xpath.getName()).get();
         final Optional<String> performance = parsedArgs.get(ClickElementByXpathOption.Performance.getName());
+        final Optional<String> clearcach = parsedArgs.get(ClickElementByXpathOption.ClearCache.getName());
+        final Optional<String> clearcookies = parsedArgs.get(ClickElementByXpathOption.ClearCookie.getName());
 
         final Optional<String> tracemode = parsedArgs.get((ClickElementByXpathOption.TraceMode.getName()));
 
@@ -60,6 +62,8 @@ public class ClickElementByXpathActionEngine implements ActionEngine {
                 neoLoadBrowserEngine.getContext().setContext(context);
                 neoLoadBrowserEngine.getContext().setTracemode(tracemode);
                 neoLoadBrowserEngine.getContext().setPerformance(performance);
+                neoLoadBrowserEngine.getContext().setClearcache(clearcach);
+                neoLoadBrowserEngine.getContext().setClearCookies(clearcookies);
             }
             String output = neoLoadBrowserEngine.clickElementByXpath(xpath, sampleResult);
             appendLineToStringBuilder(responseBuilder, output);

@@ -40,6 +40,8 @@ public class ClickOnElementByIDActionEngine implements ActionEngine {
 
         final String elementid = parsedArgs.get(ClickOnElementByIDOption.Elementid.getName()).get();
         final Optional<String> performance = parsedArgs.get(ClickOnElementByIDOption.Performance.getName());
+        final Optional<String> clearcache = parsedArgs.get(ClickOnElementByIDOption.ClearCache.getName());
+        final Optional<String> clearcookie = parsedArgs.get(ClickOnElementByIDOption.ClearCookie.getName());
 
         final Optional<String> tracemode = parsedArgs.get((ClickOnElementByIDOption.TraceMode.getName()));
 
@@ -61,6 +63,8 @@ public class ClickOnElementByIDActionEngine implements ActionEngine {
                 neoLoadBrowserEngine.getContext().setContext(context);
                 neoLoadBrowserEngine.getContext().setTracemode(tracemode);
                 neoLoadBrowserEngine.getContext().setPerformance(performance);
+                neoLoadBrowserEngine.getContext().setClearcache(clearcache);
+                neoLoadBrowserEngine.getContext().setClearCookies(clearcookie);
             }
             //String output=neoLoadBrowserEngine.loadPage(btUrl,sampleResult);
             String output = neoLoadBrowserEngine.clickOneElementID(elementid, sampleResult);

@@ -40,6 +40,8 @@ public class SelectItemFromListByIdActionEngine implements ActionEngine {
 
         final String elementid = parsedArgs.get(SelectItemFromListByIdOption.Elementid.getName()).get();
         final Optional<String> performance = parsedArgs.get(SelectItemFromListByIdOption.Performance.getName());
+        final Optional<String> clearcache  = parsedArgs.get(SelectItemFromListByIdOption.ClearCache.getName());
+        final Optional<String> clearcookies = parsedArgs.get(SelectItemFromListByIdOption.ClearCookie.getName());
 
         final Optional<String> tracemode = parsedArgs.get((SelectItemFromListByIdOption.TraceMode.getName()));
 
@@ -61,6 +63,8 @@ public class SelectItemFromListByIdActionEngine implements ActionEngine {
                 neoLoadBrowserEngine.getContext().setContext(context);
                 neoLoadBrowserEngine.getContext().setTracemode(tracemode);
                 neoLoadBrowserEngine.getContext().setPerformance(performance);
+                neoLoadBrowserEngine.getContext().setClearcache(clearcache);
+                neoLoadBrowserEngine.getContext().setClearCookies(clearcookies);
             }
 
             String output = neoLoadBrowserEngine.selectItemFromListById(elementid,fieldvalue, sampleResult);

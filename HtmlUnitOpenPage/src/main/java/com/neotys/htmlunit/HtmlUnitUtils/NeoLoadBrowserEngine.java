@@ -5,14 +5,17 @@ import com.gargoylesoftware.htmlunit.html.*;
 import com.gargoylesoftware.htmlunit.javascript.JavaScriptErrorListener;
 import com.gargoylesoftware.htmlunit.javascript.host.html.HTMLFormElement;
 import com.gargoylesoftware.htmlunit.javascript.host.performance.Performance;
+import com.gargoylesoftware.htmlunit.javascript.host.performance.PerformanceEntry;
 import com.google.common.base.Optional;
 import com.neotys.extensions.action.engine.SampleResult;
+import com.neotys.htmlunit.customActions.common.Constants;
 import com.neotys.htmlunit.customActions.common.UXDataToNeoLoad;
 import org.apache.http.conn.HttpHostConnectException;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 public class NeoLoadBrowserEngine {
 
@@ -31,8 +34,8 @@ public class NeoLoadBrowserEngine {
             case "FIREFOX_45":
                 browserVersion = BrowserVersion.FIREFOX_60;
                 break;
-            case "FIREFOX_52":
-                browserVersion = BrowserVersion.FIREFOX_52;
+            case "FIREFOX_68":
+                browserVersion = BrowserVersion.FIREFOX_68;
                 break;
             case "INTERNET_EXPLORER":
                 browserVersion = BrowserVersion.INTERNET_EXPLORER;
@@ -61,9 +64,11 @@ public class NeoLoadBrowserEngine {
         NeoLoadJavascriptListener neoloadJavascriptListener=new NeoLoadJavascriptListener(context);
 
         webClient.setJavaScriptErrorListener(neoloadJavascriptListener);
-
-        this.webClient.waitForBackgroundJavaScript(1000);
-
+        webClient.getOptions().setJavaScriptEnabled(true);
+        webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
+        this.webClient.waitForBackgroundJavaScript(10000);
+        this.webClient.waitForBackgroundJavaScriptStartingBefore(10000);
+        webClient.setAjaxController(new NicelyResynchronizingAjaxController());
     }
 
     private void traceinfo(String message)
@@ -87,11 +92,29 @@ public class NeoLoadBrowserEngine {
         this.context = context;
     }
 
+    public void clearCacheAndCookies()
+    {
+
+        if(context.getClearcache().isPresent())
+        {
+            if(context.getClearcache().get().toUpperCase().equalsIgnoreCase(Constants.TRUE))
+                webClient.getCache().clear();
+        }
+        if(context.getClearCookies().isPresent())
+        {
+            if(context.getClearCookies().get().toUpperCase().equalsIgnoreCase(Constants.TRUE))
+                webClient.getCookieManager().clearCookies();
+        }
+    }
     public String selectItem(DomElement element,String fieldvalue,SampleResult result) throws Exception {
+        HtmlPage page = null;
+        WebResponse response = null;
+        clearCacheAndCookies();
         if(element instanceof HtmlSelect)
         {
             HtmlSelect selectField = (HtmlSelect) element;
-            lastpage=selectField.setSelectedAttribute(fieldvalue,true);
+            page=selectField.setSelectedAttribute(fieldvalue,true);
+            response=page.getWebResponse();
         }
         else
         {
@@ -99,27 +122,60 @@ public class NeoLoadBrowserEngine {
             {
                 HtmlCheckBoxInput checkbox=(HtmlCheckBoxInput) element;
                 checkbox.setDefaultValue(fieldvalue);
-                lastpage= (HtmlPage) checkbox.setChecked(true);
+                page= (HtmlPage) checkbox.setChecked(true);
+                response=page.getWebResponse();
             }
 
         }
 
-        if(lastpage.getWebResponse().getStatusCode()>ERROR_400)
-            throw new HttpExeption("Page generated and Eror : "+ lastpage.getWebResponse().getStatusCode() + " page response : "+lastpage.getWebResponse().getContentAsString());
+        if(response!=null)
+        {
+
+
+            if(response.getStatusCode()>ERROR_400)
+                throw new HttpExeption("Page generated and Eror : "+ lastpage.getWebResponse().getStatusCode() + " page response : "+lastpage.getWebResponse().getContentAsString());
 
 
 
-        result.setDuration(lastpage.getWebResponse().getLoadTime());
+            result.setDuration(response.getLoadTime());
+            if(context.getPerformance().isPresent())
+            {
+                measurePerformance();
+            }
+            lastpage=page;
+            return response.getContentAsString();
+        }
+         else
+          return null;
+    }
+    public String clickOnLinkByURL(String url,SampleResult result) throws Exception {
+        clearCacheAndCookies();
+        lastpage=(HtmlPage) webClient.getCurrentWindow().getEnclosedPage();
+        HtmlAnchor link=lastpage.getAnchorByHref(url);
+        HtmlPage httpage=(HtmlPage)link.click();
+        WebResponse response=httpage.getWebResponse();
+
+        if(response.getStatusCode()>ERROR_400)
+            throw new HttpExeption("Page generated an Error : "+ lastpage.getWebResponse().getStatusCode() + " page response : "+lastpage.getWebResponse().getContentAsString());
+
+
+
+        result.setDuration(response.getLoadTime());
         if(context.getPerformance().isPresent())
         {
-            String pagename = lastpage.getPage().getUrl().toString();
-            reportPerformance((Performance) lastpage.executeJavaScript("performance").getJavaScriptResult(),pagename);
+            measurePerformance();
         }
+        lastpage=httpage;
 
-        return lastpage.getWebResponse().getContentAsString();
+        return response.getContentAsString();
+    }
+    private void getCurrentHtmlPage()
+    {
+        if(lastpage==null)
+            lastpage=(HtmlPage) webClient.getCurrentWindow().getEnclosedPage();
     }
     public String selectItemFromListByName(String name,String fieldvalue,SampleResult result) throws Exception {
-        lastpage=(HtmlPage) webClient.getCurrentWindow().getEnclosedPage();
+        getCurrentHtmlPage();
         DomElement element=lastpage.getElementByName(name);
 
         String output= selectItem(element,fieldvalue,result);
@@ -127,7 +183,7 @@ public class NeoLoadBrowserEngine {
     }
 
     public String selectItemFromListById(String id,String fieldvalue,SampleResult result) throws Exception {
-        lastpage=(HtmlPage) webClient.getCurrentWindow().getEnclosedPage();
+        getCurrentHtmlPage();
         DomElement element=lastpage.getElementById(id);
 
         String output= selectItem(element,fieldvalue,result);
@@ -135,7 +191,7 @@ public class NeoLoadBrowserEngine {
 
     }
     public String clickElementByXpath(String xpath,SampleResult result) throws Exception {
-        lastpage=(HtmlPage) webClient.getCurrentWindow().getEnclosedPage();
+        getCurrentHtmlPage();
         DomElement element=lastpage.getFirstByXPath(xpath);
         String output= clickElement(element,result);
         return output;
@@ -148,7 +204,7 @@ public class NeoLoadBrowserEngine {
 
 
     public String setTextonElementByName(String text,String id, SampleResult result,Optional<String> formname) throws Exception {
-        lastpage=(HtmlPage) webClient.getCurrentWindow().getEnclosedPage();
+        getCurrentHtmlPage();
         DomElement element;
         if(formname.isPresent())
         {
@@ -178,7 +234,14 @@ public class NeoLoadBrowserEngine {
 
     }
 
+    private void measurePerformance() throws Exception {
+        String pagename = lastpage.getPage().getUrl().toString();
+        reportPerformance((Performance) lastpage.executeJavaScript("performance").getJavaScriptResult(),pagename);
+
+    }
+
     public String setTextTOElement(DomElement element,String text,SampleResult result) throws Exception {
+        clearCacheAndCookies();
         if(element instanceof HtmlTextInput)
         {
             HtmlTextInput textField = (HtmlTextInput) element;
@@ -211,7 +274,7 @@ public class NeoLoadBrowserEngine {
                 }
             }
         }
-        lastpage=(HtmlPage) webClient.getCurrentWindow().getEnclosedPage();
+        getCurrentHtmlPage();
         if(lastpage.getWebResponse().getStatusCode()>ERROR_400)
             throw new HttpExeption("Page generated and Eror : "+ lastpage.getWebResponse().getStatusCode() + " page response : "+lastpage.getWebResponse().getContentAsString());
 
@@ -219,14 +282,13 @@ public class NeoLoadBrowserEngine {
         result.setDuration(lastpage.getWebResponse().getLoadTime());
         if(context.getPerformance().isPresent())
         {
-            String pagename = lastpage.getPage().getUrl().toString();
-            reportPerformance((Performance) lastpage.executeJavaScript("performance").getJavaScriptResult(),pagename);
+            measurePerformance();
         }
 
         return lastpage.getWebResponse().getContentAsString();
     }
     public String clickONeElementByName(String name, SampleResult result,Optional<String> forname) throws Exception {
-        lastpage=(HtmlPage) webClient.getCurrentWindow().getEnclosedPage();
+        getCurrentHtmlPage();
         DomElement element;
         if(forname.isPresent())
         {
@@ -244,6 +306,8 @@ public class NeoLoadBrowserEngine {
 
 
     public String clickElement(DomElement element , SampleResult result) throws Exception {
+        WebResponse response;
+        clearCacheAndCookies();
         lastpage=element.click();
 
         if(lastpage.getWebResponse().getStatusCode()>ERROR_400)
@@ -253,8 +317,7 @@ public class NeoLoadBrowserEngine {
         result.setDuration(lastpage.getWebResponse().getLoadTime());
         if(context.getPerformance().isPresent())
         {
-            String pagename = lastpage.getPage().getUrl().toString();
-            reportPerformance((Performance) lastpage.executeJavaScript("performance").getJavaScriptResult(),pagename);
+            measurePerformance();
         }
 
         return lastpage.getWebResponse().getContentAsString();
@@ -267,7 +330,7 @@ public class NeoLoadBrowserEngine {
         return output;
     }
     public String loadPage(String url, SampleResult result) throws Exception {
-
+        clearCacheAndCookies();
         HtmlPage page = this.webClient.getPage(url);
         traceinfo("Page has been loaded "+ page.getWebResponse().getStatusMessage());
         if(page.getWebResponse().getStatusCode()>ERROR_400)
@@ -281,9 +344,7 @@ public class NeoLoadBrowserEngine {
         if(context.getPerformance().isPresent())
         {
 
-            String pagename = lastpage.getPage().getUrl().toString();
-            reportPerformance((Performance) page.executeJavaScript("performance").getJavaScriptResult(),pagename);
-
+            measurePerformance();
         }
 
 

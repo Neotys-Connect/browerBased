@@ -41,6 +41,8 @@ public class ClickOnElementByClassActionEngine implements ActionEngine {
         final Optional<String> performance = parsedArgs.get(ClickOnElementByClassOption.Performance.getName());
         final Optional<String> forname=parsedArgs.get(ClickOnElementByClassOption.FormName.getName());
         final Optional<String> tracemode = parsedArgs.get((ClickOnElementByClassOption.TraceMode.getName()));
+        final Optional<String> clearcache = parsedArgs.get(ClickOnElementByClassOption.ClearCache.getName());
+        final Optional<String> clearcookies = parsedArgs.get(ClickOnElementByClassOption.ClearCookie.getName());
 
 
         final Logger logger = context.getLogger();
@@ -60,6 +62,8 @@ public class ClickOnElementByClassActionEngine implements ActionEngine {
                 neoLoadBrowserEngine.getContext().setContext(context);
                 neoLoadBrowserEngine.getContext().setTracemode(tracemode);
                 neoLoadBrowserEngine.getContext().setPerformance(performance);
+                neoLoadBrowserEngine.getContext().setClearCookies(clearcookies);
+                neoLoadBrowserEngine.getContext().setClearcache(clearcache);
             }
             //String output=neoLoadBrowserEngine.loadPage(btUrl,sampleResult);
             String output = neoLoadBrowserEngine.clickONeElementByName(name, sampleResult,forname);

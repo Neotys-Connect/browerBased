@@ -8,13 +8,32 @@ public class BrowserContext {
     private Context context;
     private Optional<String> proxyNAme;
     private Optional<String> performance;
+    private Optional<String> clearcache;
+    private Optional<String> clearCookies;
 
-    public BrowserContext(Optional<String> tracemode, Context context, Optional<String> proxyNAme,Optional<String> perf) {
+    public BrowserContext(Optional<String> tracemode, Context context, Optional<String> proxyNAme, Optional<String> performance, Optional<String> clearcache, Optional<String> clearCookies) {
         this.tracemode = tracemode;
         this.context = context;
         this.proxyNAme = proxyNAme;
-        this.performance=perf;
+        this.performance = performance;
+        this.clearcache = clearcache;
+        this.clearCookies = clearCookies;
+    }
 
+    public Optional<String> getClearcache() {
+        return clearcache;
+    }
+
+    public void setClearcache(Optional<String> clearcache) {
+        this.clearcache = clearcache;
+    }
+
+    public Optional<String> getClearCookies() {
+        return clearCookies;
+    }
+
+    public void setClearCookies(Optional<String> clearCookies) {
+        this.clearCookies = clearCookies;
     }
 
     public Optional<String> getTracemode() {

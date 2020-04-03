@@ -41,6 +41,8 @@ public class SetTextonElementByIDActionEngine implements ActionEngine {
         final String text = parsedArgs.get(SetTextonElementByIDOption.Texte.getName()).get();
 
         final Optional<String> performance = parsedArgs.get(SetTextonElementByIDOption.Performance.getName());
+        final Optional<String> clearcache = parsedArgs.get(SetTextonElementByIDOption.ClearCache.getName());
+        final Optional<String> clearcookies = parsedArgs.get(SetTextonElementByIDOption.ClearCookie.getName());
 
         final Optional<String> tracemode = parsedArgs.get((SetTextonElementByIDOption.TraceMode.getName()));
 
@@ -62,6 +64,8 @@ public class SetTextonElementByIDActionEngine implements ActionEngine {
                 neoLoadBrowserEngine.getContext().setContext(context);
                 neoLoadBrowserEngine.getContext().setTracemode(tracemode);
                 neoLoadBrowserEngine.getContext().setPerformance(performance);
+                neoLoadBrowserEngine.getContext().setClearcache(clearcache);
+                neoLoadBrowserEngine.getContext().setClearCookies(clearcookies);
             }
             //String output=neoLoadBrowserEngine.loadPage(btUrl,sampleResult);
             String output = neoLoadBrowserEngine.setTextonElementById(text,name, sampleResult);

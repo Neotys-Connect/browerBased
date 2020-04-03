@@ -20,6 +20,8 @@ public class PerformanceMetrics {
     private long advanced_DOMInteractTime;
     private long uXTime;
 
+    //#TODO store the timestamp related to the event -> store in monitors later
+
     public PerformanceMetrics(Performance performance)
     {
         long start= performance.getTiming().getRedirectStart() == 0 ?  performance.getTiming().getFetchStart() :  performance.getTiming().getRedirectStart();
@@ -34,6 +36,8 @@ public class PerformanceMetrics {
             advanced_DOMLoadingTime =performance.getTiming().getDomContentLoadedEventEnd()-performance.getTiming().getDomContentLoadedEventStart();
             advanced_DOMInteractTime =performance.getTiming().getLoadEventEnd()-performance.getTiming().getNavigationStart();
         }
+
+
     }
 
 
@@ -42,11 +46,11 @@ public class PerformanceMetrics {
         List<NLWebblockData> data=new ArrayList<>();
         Field[] listofField=this.getClass().getDeclaredFields();
         Arrays.stream(listofField).forEach(f->{
-            if(f.getType().equals(Long.class))
+            if(f.getType().getName().equals("long"))
             {
                 try {
                     String metricname=f.getName();
-                    data.add(new NLWebblockData(Constants.UX_UNIT,((NLWebblockData) f.get(this)).getValue(), Instant.now().toEpochMilli(),metricname));
+                    data.add(new NLWebblockData(Constants.UX_UNIT,f.getLong(this), Instant.now().toEpochMilli(),metricname));
 
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();

@@ -51,12 +51,12 @@ public class UXDataToNeoLoad {
 
         List<String> path = new ArrayList<>();
         path.add(Constants.BROWSERBASED);
+        path.add(context.getContext().getCurrentVirtualUser().getCurrentStep());
         path.add(pageName);
         path.addAll(Arrays.asList(nlWebblockData.getMetricName().split("_")));
         traceInfo(path.stream().collect(Collectors.joining("/")));
         monitor.setPath(path);
         monitor.setUnit(nlWebblockData.getUnit());
-       // traceInfo(context,whiteblockData.getUnit());
         monitor.setName(path.get(path.size()-1));
         traceInfo(path.get(path.size()-1));
         CustomMonitorValues valuesInners=new CustomMonitorValues();
@@ -65,7 +65,7 @@ public class UXDataToNeoLoad {
         Instant instant = Instant.now();
         customMonitorValuesInner.setTimestamp(instant.getEpochSecond());
         customMonitorValuesInner.setValue((float)nlWebblockData.getValue());
-        traceInfo("value :" +String.valueOf(nlWebblockData.getValue())+" ts:"+String.valueOf(System.currentTimeMillis()));
+        traceInfo("value :" +String.valueOf(nlWebblockData.getValue())+" ts:"+String.valueOf(instant.getEpochSecond()));
         valuesInners.add(customMonitorValuesInner);
        //
         monitor.setValues(valuesInners);
@@ -86,7 +86,7 @@ public class UXDataToNeoLoad {
     {
         if(context.getTracemode().isPresent())
         {
-            if(context.getTracemode().get().toLowerCase().equals(Constants.TRUE))
+            if(context.getTracemode().get().toUpperCase().equals(Constants.TRUE))
             {
                 context.getContext().getLogger().info(log);
             }
