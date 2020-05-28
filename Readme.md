@@ -12,10 +12,7 @@ Traditional load testing techniques that simulate the protocol level traffic tha
 behavior, hence the need to introduce browser based techniques that simulate user behaviours with using headless browsers.
 
 These Advanced Actions allows you to leverage a browser based approach with  [NeoLoad](https://www.neotys.com/neoload/overview) 
- 
-* **Browser based advanced actions**
-
-Actions are based on the Htmlunit, a headless browser that allows to mimic user actions on the browser such as: 
+Actions are based on Htmlunit, a headless browser that allows to mimic user actions on the browser such as: 
    
 * OpenPage: Loads a web page in the browser.
 * ClickOnElementByXpath: Clicks on a Web Component by Xpath.
@@ -35,14 +32,14 @@ Actions are based on the Htmlunit, a headless browser that allows to mimic user 
 | NeoLoad  | 7.3+ (Enterprise or Professional Edition w/ Integration & Advanced Usage and NeoLoad Web option required)|
 | Requirements | NeoLoad Web |
 | Bundled in NeoLoad | No
-| Download Binaries | <ul><li>[latest release](https://github.com/NeotysLab/browerBased/releases/latest) is only compatible with NeoLoad from version 6.7</li><li> Use this [release](https://github.com/Neotys-Labs/Dynatrace/releases/tag/Neotys-Labs%2FDynatrace.git-2.0.10) for previous NeoLoad versions</li></ul>|
+| Download Binaries | <ul><li>[latest release](https://github.com/NeotysLab/browerBased/releases/latest) is only compatible with NeoLoad from version 6.7</li>
 
 ## Installation
 
 1. Download the [latest release](https://github.com/NeotysLab/browerBased/releases/latest) for NeoLoad from version 7.3
 1. Read the NeoLoad documentation to see [How to install a custom Advanced Action](https://www.neotys.com/documents/doc/neoload/latest/en/html/#25928.htm).
 
-<p align="center"><img src="/screenshot/advanced_action.png" alt="Browser Based Advanced Action" /></p>
+<p align="center"><img src="/screenshot/Custom_Actions.png" alt="Browser Based Advanced Action" /></p>
 
 ## NeoLoad Set-up
 
