@@ -4,8 +4,8 @@
 
 ## Overview
 
-More and more web applicationS are java script heavy using framework such as Angular, JQuery that are CPU and memory intensive on the browser side.
-Moreover, badly optimized client side programming qnd inefficient use of the ajax calls or caching can lead to lot of netyork traffic leading to poor 
+More and more web applications are java script heavy using framework such as Angular, JQuery that are CPU and memory intensive on the browser side.
+Moreover, badly optimized client side programming and inefficient use of the ajax calls or caching can lead to lot of network traffic leading to poor 
 end user experience especially over lower bandwidth connexion.
  
 Traditional load testing techniques that simulate the protocol level traffic that the browser generate do not capture the client side 
@@ -48,7 +48,7 @@ Once installed, how to use in a given NeoLoad project:
 1. Create a “Browser Based” User Path.
 1. Insert one of the browser based advanced actions in the ‘Actions’ block. A typical sequence will be openpage, interactions with web pages content, and finally closeBrowser.
    <p align="center"><img src="/screenshot/BBActions.png" alt="Browser based User Path" /></p>
-1. For each of the browser based actions, set the parsameters to simulate user interactions with the web applications you are about to load test.
+1. For each of the browser based actions, set the parameters to simulate user interactions with the web applications you are about to load test.
    <p align="center"><img src="/screenshot/OpenPage.png" alt="Action's parameters" /></p>
 1. Select the Actions container and set the runtime, pacing, and general settings.  
 1. Create a "PopulationBrowserBased" Population that contains 100% of "Browser Based" User Path.
