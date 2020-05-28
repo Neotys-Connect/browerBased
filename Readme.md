@@ -39,7 +39,7 @@ Actions are based on Htmlunit, a headless browser that allows to mimic user acti
 1. Download the [latest release](https://github.com/NeotysLab/browerBased/releases/latest) for NeoLoad from version 7.3
 1. Read the NeoLoad documentation to see [How to install a custom Advanced Action](https://www.neotys.com/documents/doc/neoload/latest/en/html/#25928.htm).
 
-<p align="center"><img src="/screenshot/Custom_Actions.png" alt="Browser Based Advanced Action" /></p>
+<p align="center"><img src="/screenshot/CustomActions.png" alt="Browser Based Advanced Action" /></p>
 
 ## NeoLoad Set-up
 
